@@ -1,7 +1,7 @@
-const CACHE_NAME = 'eruul-bie-eruul-jin-v1';
+const CACHE_NAME = 'eruul-bie-eruul-jin-flat-v1';
 const ASSETS = [
   './', './index.html', './style.css', './app.js', './manifest.json',
-  './assets/hero.jpg', './assets/balance.jpg', './assets/energy.jpg'
+  './hero.jpg', './balance.jpg', './energy.jpg'
 ];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
