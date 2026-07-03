@@ -1,0 +1,10 @@
+{
+  "name": "Биеийн Мэлмий",
+  "short_name": "Биеийн Мэлмий",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f0e8",
+  "theme_color": "#12372A",
+  "description": "30 хоногийн жингийн тэнцвэрийн хувийн төлөвлөгөө гаргах систем",
+  "icons": []
+}

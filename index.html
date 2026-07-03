@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#12372A" />
+  <title>Биеийн Мэлмий — 30 хоногийн жингийн тэнцвэр</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="hero__overlay"></div>
+      <nav class="topbar">
+        <div class="brand">
+          <div class="brand__mark">◉</div>
+          <div>
+            <strong>Биеийн Мэлмий</strong>
+            <span>30 хоногийн жингийн тэнцвэр</span>
+          </div>
+        </div>
+        <button class="ghost-btn" type="button" id="resetBtn">Шинээр бөглөх</button>
+      </nav>
+      <section class="hero__content">
+        <p class="eyebrow">Өөрийн биеийн өгөгдлөөр тайлан гаргах систем</p>
+        <h1>Өндөр, жин, нас, дадал зуршилдаа тохирсон 30 хоногийн төлөвлөгөө</h1>
+        <p class="hero__lead">Кофе, цай уугаад үр дүнгүй явсан бол энэ удаа өөрийн биеийн бодит үзүүлэлт, хооллолт, хөдөлгөөний боломжид тулгуурласан төлөвлөгөөгөөр эхлээрэй.</p>
+        <div class="hero__badges">
+          <span>BMI тооцно</span>
+          <span>Дадлын алдаа</span>
+          <span>3 төрлийн төлөвлөгөө</span>
+          <span>PDF болгож хадгална</span>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section class="notice-card">
+        <strong>Анхаарах зүйл:</strong>
+        Энэ систем нь эмнэлгийн онош тавихгүй. Илүүдэл жинтэй холбоотой анхаарах дохио, дадал зуршлын зөвлөмж, ерөнхий төлөвлөгөө гаргана. Жирэмсэн, 18-аас доош насны, архаг өвчтэй, эм тогтмол хэрэглэдэг бол мэргэжлийн эмчид хандаарай.
+      </section>
+
+      <section class="layout">
+        <form id="healthForm" class="form-card" autocomplete="on">
+          <div class="section-title">
+            <p>Алхам 1</p>
+            <h2>Үндсэн мэдээлэл</h2>
+          </div>
+
+          <div class="grid two">
+            <label>Нэр эсвэл код
+              <input name="name" type="text" placeholder="Жишээ: Бат / Хэрэглэгч 01" maxlength="40" />
+            </label>
+            <label>Нас
+              <input name="age" type="number" min="10" max="90" required placeholder="38" />
+            </label>
+            <label>Хүйс
+              <select name="gender" required>
+                <option value="">Сонгох</option>
+                <option value="female">Эмэгтэй</option>
+                <option value="male">Эрэгтэй</option>
+                <option value="other">Бусад / хэлэхгүй</option>
+              </select>
+            </label>
+            <label>Өндөр /см/
+              <input name="height" type="number" min="100" max="230" required placeholder="170" />
+            </label>
+            <label>Одоогийн жин /кг/
+              <input name="weight" type="number" min="30" max="250" required placeholder="85" step="0.1" />
+            </label>
+            <label>Зорилтот жин /кг/
+              <input name="goalWeight" type="number" min="30" max="250" required placeholder="75" step="0.1" />
+            </label>
+            <label>Бэлхүүсний тойрог /см/
+              <input name="waist" type="number" min="40" max="220" placeholder="95" step="0.1" />
+            </label>
+            <label>Өдөрт хэдэн цаг суудаг вэ?
+              <input name="sittingHours" type="number" min="0" max="18" required placeholder="8" step="0.5" />
+            </label>
+          </div>
+
+          <div class="section-title">
+            <p>Алхам 2</p>
+            <h2>Амьдралын хэв маяг</h2>
+          </div>
+
+          <div class="grid two">
+            <label>Ажлын хэв маяг
+              <select name="workType" required>
+                <option value="">Сонгох</option>
+                <option value="sedentary">Ихэнхдээ суугаа</option>
+                <option value="mixed">Сууж/алхаж холимог</option>
+                <option value="active">Хөдөлгөөнтэй ажил</option>
+              </select>
+            </label>
+            <label>Өдөрт хооллох давтамж
+              <select name="meals" required>
+                <option value="">Сонгох</option>
+                <option value="1-2">1–2 удаа</option>
+                <option value="3">3 удаа</option>
+                <option value="4plus">4 ба түүнээс дээш</option>
+              </select>
+            </label>
+            <label>Оройн хамгийн сүүлийн хоол
+              <select name="lastMeal" required>
+                <option value="">Сонгох</option>
+                <option value="early">19:00 цагаас өмнө</option>
+                <option value="mid">19:00–21:00</option>
+                <option value="late">21:00 цагаас хойш</option>
+              </select>
+            </label>
+            <label>Өдөрт уудаг ус
+              <select name="water" required>
+                <option value="">Сонгох</option>
+                <option value="low">1 литрээс бага</option>
+                <option value="mid">1–2 литр</option>
+                <option value="good">2 литрээс дээш</option>
+              </select>
+            </label>
+            <label>Амттан, чихэрлэг зүйл
+              <select name="sweet" required>
+                <option value="">Сонгох</option>
+                <option value="low">Бага</option>
+                <option value="mid">Дунд</option>
+                <option value="high">Их / бараг өдөр бүр</option>
+              </select>
+            </label>
+            <label>Гурил, будаа, талх, боов
+              <select name="carb" required>
+                <option value="">Сонгох</option>
+                <option value="low">Бага</option>
+                <option value="mid">Дунд</option>
+                <option value="high">Их / хоол бүрт</option>
+              </select>
+            </label>
+            <label>Нойр
+              <select name="sleep" required>
+                <option value="">Сонгох</option>
+                <option value="low">6 цагаас бага</option>
+                <option value="mid">6–7 цаг</option>
+                <option value="good">7–9 цаг</option>
+              </select>
+            </label>
+            <label>Стресс
+              <select name="stress" required>
+                <option value="">Сонгох</option>
+                <option value="low">Бага</option>
+                <option value="mid">Дунд</option>
+                <option value="high">Их</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="section-title">
+            <p>Алхам 3</p>
+            <h2>Танд тохирох төлөвлөгөө</h2>
+          </div>
+
+          <div class="radio-grid">
+            <label class="choice">
+              <input type="radio" name="planType" value="active" required />
+              <span>
+                <strong>Хөдөлгөөнтэй төлөвлөгөө</strong>
+                Алхалт, гэрийн дасгал, хооллолтын зохицуулалттай.
+              </span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="planType" value="lowmove" required />
+              <span>
+                <strong>Хөдөлгөөн багатай төлөвлөгөө</strong>
+                Завгүй, суугаа ажилтай, дасгал хийх боломж багатай хүмүүст.
+              </span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="planType" value="support" required />
+              <span>
+                <strong>Дэмжих бүтээгдэхүүнтэй төлөвлөгөө</strong>
+                Хооллолт, ус, дадал дээр нэмэлт дэмжлэгтэй хувилбар.
+              </span>
+            </label>
+          </div>
+
+          <div class="symptom-box">
+            <p>Одоо илэрч буй зовиур байвал сонгоно уу</p>
+            <div class="check-grid">
+              <label><input type="checkbox" name="signals" value="back" /> Нуруу өвдөх</label>
+              <label><input type="checkbox" name="signals" value="knee" /> Өвдөг өвдөх</label>
+              <label><input type="checkbox" name="signals" value="breath" /> Амьсгаадах</label>
+              <label><input type="checkbox" name="signals" value="sleep" /> Нойр муудах</label>
+              <label><input type="checkbox" name="signals" value="pressure" /> Даралт ихсэх</label>
+              <label><input type="checkbox" name="signals" value="sugar" /> Сахарын асуудал</label>
+              <label><input type="checkbox" name="signals" value="digestion" /> Хоол боловсруулах зовиур</label>
+              <label><input type="checkbox" name="signals" value="none" /> Байхгүй</label>
+            </div>
+          </div>
+
+          <div class="actions sticky-actions">
+            <button class="primary-btn" type="submit">Тайлан гаргах</button>
+            <button class="secondary-btn" type="button" id="demoBtn">Жишээ бөглөх</button>
+          </div>
+        </form>
+
+        <aside class="side-card">
+          <h3>Систем юу гаргах вэ?</h3>
+          <ul>
+            <li>BMI ба жингийн ангилал</li>
+            <li>Бэлхүүс/өндрийн харьцааны анхаарах дохио</li>
+            <li>Жин нэмэхэд нөлөөлж буй гол дадал</li>
+            <li>Хооллолтын хувьчилсан зөвлөмж</li>
+            <li>30 хоногийн өдөрчилсөн төлөвлөгөө</li>
+            <li>Хэвлэх болон PDF болгон хадгалах тайлан</li>
+          </ul>
+          <div class="mini-cta">
+            <strong>Page дээр ашиглах үг</strong>
+            <p>“Өөрийн биеийн өгөгдлөөр 30 хоногийн төлөвлөгөө гаргуулах бол линкээр орж бөглөөрэй.”</p>
+          </div>
+        </aside>
+      </section>
+
+      <section id="report" class="report hidden" aria-live="polite">
+        <div class="report__head">
+          <div>
+            <p class="eyebrow">Хувийн тайлан</p>
+            <h2 id="reportTitle">Биеийн Мэлмий тайлан</h2>
+            <p id="reportMeta"></p>
+          </div>
+          <div class="report-actions">
+            <button class="primary-btn" type="button" id="printBtn">PDF / Хэвлэх</button>
+            <button class="secondary-btn" type="button" id="copyBtn">Хураангуй хуулах</button>
+          </div>
+        </div>
+
+        <div id="reportContent"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Биеийн Мэлмий — ерөнхий мэдээлэл, дадлын төлөвлөгөөний систем. Эмнэлгийн онош, эмчилгээний заавар биш.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
