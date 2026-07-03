@@ -1,10 +1,9 @@
 {
-  "name": "Биеийн Мэлмий",
-  "short_name": "Биеийн Мэлмий",
+  "name": "Эрүүл Бие — Эрүүл Жин",
+  "short_name": "Эрүүл Жин",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f4f0e8",
-  "theme_color": "#12372A",
-  "description": "30 хоногийн жингийн тэнцвэрийн хувийн төлөвлөгөө гаргах систем",
-  "icons": []
+  "background_color": "#f6fbf8",
+  "theme_color": "#0f766e",
+  "description": "1, 2, 3 сарын жингийн тэнцвэрийн хувийн төлөвлөгөөний урьдчилсан үнэлгээ"
 }

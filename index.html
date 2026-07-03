@@ -2,243 +2,196 @@
 <html lang="mn">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#12372A" />
-  <title>Биеийн Мэлмий — 30 хоногийн жингийн тэнцвэр</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f766e" />
+  <meta name="description" content="Эрүүл Бие — Эрүүл Жин: 1, 2, 3 сарын жингийн тэнцвэрийн хувийн төлөвлөгөөний урьдчилсан үнэлгээ." />
+  <title>Эрүүл Бие — Эрүүл Жин</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app-shell">
-    <header class="hero">
-      <div class="hero__overlay"></div>
-      <nav class="topbar">
-        <div class="brand">
-          <div class="brand__mark">◉</div>
-          <div>
-            <strong>Биеийн Мэлмий</strong>
-            <span>30 хоногийн жингийн тэнцвэр</span>
-          </div>
+  <header class="hero">
+    <div class="heroShade"></div>
+    <div class="heroContent">
+      <div class="badge">1 сарын хямдрал үргэлжилж байна</div>
+      <h1>Эрүүл Бие — Эрүүл Жин</h1>
+      <p class="subtitle">Өдөр тутмын энгийн хооллолтоор эрүүлжих, жин бууруулах, халдварт бус өвчлөлийн эрсдэлийг багасгах 1, 2, 3 сарын хувийн төлөвлөгөө.</p>
+      <div class="heroActions">
+        <a href="#form" class="btn primary">Үнэлгээ бөглөх</a>
+        <a href="#prices" class="btn ghost">Үнийн багц харах</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro gridTwo">
+      <article class="glassCard">
+        <h2>Кофе, цайгаар турж чадаагүй бол</h2>
+        <p>Энэ удаа зүгээр нэг бүтээгдэхүүн биш. Таны нас, өндөр, жин, бэлхүүс, хооллолт, суугаа хэв маяг, нойр, усны хэрэглээнд тулгуурлан өөрт тань тохирсон төлөвлөгөө сонгоно.</p>
+        <p>Үнэтэй, олддоггүй орц биш. Ихэнх айлд байдаг энгийн хүнс, зөв хэмжээ, зөв цаг, ус, нойр, хөнгөн хөдөлгөөний дадлаар эхэлнэ.</p>
+      </article>
+      <article class="imageCard balanceBg">
+        <div>
+          <h2>Эхлээд эрүүлжинэ</h2>
+          <p>1. Биеийн ачааллаа багасгана<br>2. Жингээ аажмаар бууруулна<br>3. Халдварт бус өвчлөлийн эрсдэлээс сэргийлэх дадалтай болно</p>
         </div>
-        <button class="ghost-btn" type="button" id="resetBtn">Шинээр бөглөх</button>
-      </nav>
-      <section class="hero__content">
-        <p class="eyebrow">Өөрийн биеийн өгөгдлөөр тайлан гаргах систем</p>
-        <h1>Өндөр, жин, нас, дадал зуршилдаа тохирсон 30 хоногийн төлөвлөгөө</h1>
-        <p class="hero__lead">Кофе, цай уугаад үр дүнгүй явсан бол энэ удаа өөрийн биеийн бодит үзүүлэлт, хооллолт, хөдөлгөөний боломжид тулгуурласан төлөвлөгөөгөөр эхлээрэй.</p>
-        <div class="hero__badges">
-          <span>BMI тооцно</span>
-          <span>Дадлын алдаа</span>
-          <span>3 төрлийн төлөвлөгөө</span>
-          <span>PDF болгож хадгална</span>
-        </div>
-      </section>
-    </header>
+      </article>
+    </section>
 
-    <main>
-      <section class="notice-card">
-        <strong>Анхаарах зүйл:</strong>
-        Энэ систем нь эмнэлгийн онош тавихгүй. Илүүдэл жинтэй холбоотой анхаарах дохио, дадал зуршлын зөвлөмж, ерөнхий төлөвлөгөө гаргана. Жирэмсэн, 18-аас доош насны, архаг өвчтэй, эм тогтмол хэрэглэдэг бол мэргэжлийн эмчид хандаарай.
-      </section>
+    <section class="notice">
+      <h2>Анхаарах зүйл</h2>
+      <p>Энэхүү систем нь өвчин оношлохгүй, эмчилгээ бичихгүй. Харин биеийн жингийн индекс, амьдралын хэв маяг, хооллолтын зуршилд тулгуурлан халдварт бус өвчлөлийн болзошгүй эрсдэлийн дохиог тайлбарлаж, эрүүл дадалд чиглүүлэх урьдчилсан үнэлгээ гаргана.</p>
+    </section>
 
-      <section class="layout">
-        <form id="healthForm" class="form-card" autocomplete="on">
-          <div class="section-title">
-            <p>Алхам 1</p>
-            <h2>Үндсэн мэдээлэл</h2>
-          </div>
+    <section id="prices" class="prices">
+      <div class="sectionTitle">
+        <span>Багц сонголт</span>
+        <h2>1, 2, 3 сарын төлөвлөгөө</h2>
+      </div>
+      <div class="priceGrid">
+        <article class="priceCard">
+          <h3>1 сарын эхлэл</h3>
+          <p class="price">11,900₮</p>
+          <p>30 хоногийн хооллолт, ус, нойр, хөдөлгөөний энгийн төлөвлөгөө.</p>
+        </article>
+        <article class="priceCard featured">
+          <h3>2 сарын тогтворжилт</h3>
+          <p class="price">20,500₮</p>
+          <p>Эхний 30 хоногийн дадлыг үргэлжлүүлж, буцааж нэмэхгүй тогтвортой горим.</p>
+        </article>
+        <article class="priceCard">
+          <h3>3 сарын бүрэн өөрчлөлт</h3>
+          <p class="price">30,000₮</p>
+          <p>90 хоногийн хооллолт, дадал, жингийн тэнцвэрийн бүрэн төлөвлөгөө.</p>
+        </article>
+      </div>
+      <p class="discount">Энэ үнэ 1 сарын хугацаатай хямдрал. Төлөвлөгөөгөө эрт эхлүүлэх тусам таны биеийн өөрчлөлт эрт эхэлнэ.</p>
+    </section>
 
-          <div class="grid two">
-            <label>Нэр эсвэл код
-              <input name="name" type="text" placeholder="Жишээ: Бат / Хэрэглэгч 01" maxlength="40" />
-            </label>
-            <label>Нас
-              <input name="age" type="number" min="10" max="90" required placeholder="38" />
-            </label>
+    <section id="form" class="formWrap">
+      <div class="sectionTitle">
+        <span>Урьдчилсан үнэлгээ</span>
+        <h2>Мэдээллээ бөглөөд BMI болон төлөвлөгөөний чиглэлээ харна</h2>
+      </div>
+
+      <form id="healthForm" class="healthForm" autocomplete="on">
+        <div class="formBlock">
+          <h3>1. Үндсэн мэдээлэл</h3>
+          <div class="fields">
+            <label>Нэр <input id="name" type="text" placeholder="Жишээ: Болд" /></label>
+            <label>Нас <input id="age" type="number" min="16" max="90" placeholder="38" required /></label>
             <label>Хүйс
-              <select name="gender" required>
+              <select id="gender" required>
                 <option value="">Сонгох</option>
-                <option value="female">Эмэгтэй</option>
                 <option value="male">Эрэгтэй</option>
-                <option value="other">Бусад / хэлэхгүй</option>
+                <option value="female">Эмэгтэй</option>
               </select>
             </label>
-            <label>Өндөр /см/
-              <input name="height" type="number" min="100" max="230" required placeholder="170" />
-            </label>
-            <label>Одоогийн жин /кг/
-              <input name="weight" type="number" min="30" max="250" required placeholder="85" step="0.1" />
-            </label>
-            <label>Зорилтот жин /кг/
-              <input name="goalWeight" type="number" min="30" max="250" required placeholder="75" step="0.1" />
-            </label>
-            <label>Бэлхүүсний тойрог /см/
-              <input name="waist" type="number" min="40" max="220" placeholder="95" step="0.1" />
-            </label>
-            <label>Өдөрт хэдэн цаг суудаг вэ?
-              <input name="sittingHours" type="number" min="0" max="18" required placeholder="8" step="0.5" />
-            </label>
+            <label>Өндөр /см/ <input id="height" type="number" min="120" max="230" placeholder="175" required /></label>
+            <label>Одоогийн жин /кг/ <input id="weight" type="number" min="35" max="250" step="0.1" placeholder="95" required /></label>
+            <label>Зорилтот жин /кг/ <input id="targetWeight" type="number" min="35" max="220" step="0.1" placeholder="80" required /></label>
+            <label>Бэлхүүс /см/ <input id="waist" type="number" min="45" max="220" step="0.1" placeholder="102" /></label>
           </div>
+        </div>
 
-          <div class="section-title">
-            <p>Алхам 2</p>
-            <h2>Амьдралын хэв маяг</h2>
-          </div>
-
-          <div class="grid two">
-            <label>Ажлын хэв маяг
-              <select name="workType" required>
+        <div class="formBlock">
+          <h3>2. Амьдралын хэв маяг</h3>
+          <div class="fields">
+            <label>Ажлын төрөл
+              <select id="workType" required>
                 <option value="">Сонгох</option>
                 <option value="sedentary">Ихэнхдээ суугаа</option>
-                <option value="mixed">Сууж/алхаж холимог</option>
+                <option value="mixed">Суух, алхах холимог</option>
                 <option value="active">Хөдөлгөөнтэй ажил</option>
               </select>
             </label>
-            <label>Өдөрт хооллох давтамж
-              <select name="meals" required>
+            <label>Өдөрт суудаг цаг <input id="sittingHours" type="number" min="0" max="18" step="0.5" placeholder="8" required /></label>
+            <label>Нойр /цаг/ <input id="sleepHours" type="number" min="2" max="12" step="0.5" placeholder="7" required /></label>
+            <label>Ус /литр/ <input id="waterLiters" type="number" min="0" max="8" step="0.1" placeholder="1.5" required /></label>
+            <label>Өдөрт хооллох тоо <input id="meals" type="number" min="1" max="8" placeholder="3" required /></label>
+            <label>Оройн сүүлийн хоол
+              <select id="lastMeal" required>
                 <option value="">Сонгох</option>
-                <option value="1-2">1–2 удаа</option>
-                <option value="3">3 удаа</option>
-                <option value="4plus">4 ба түүнээс дээш</option>
+                <option value="before19">19:00 цагаас өмнө</option>
+                <option value="19to21">19:00–21:00</option>
+                <option value="after21">21:00 цагаас хойш</option>
               </select>
             </label>
-            <label>Оройн хамгийн сүүлийн хоол
-              <select name="lastMeal" required>
-                <option value="">Сонгох</option>
-                <option value="early">19:00 цагаас өмнө</option>
-                <option value="mid">19:00–21:00</option>
-                <option value="late">21:00 цагаас хойш</option>
-              </select>
-            </label>
-            <label>Өдөрт уудаг ус
-              <select name="water" required>
-                <option value="">Сонгох</option>
-                <option value="low">1 литрээс бага</option>
-                <option value="mid">1–2 литр</option>
-                <option value="good">2 литрээс дээш</option>
-              </select>
-            </label>
-            <label>Амттан, чихэрлэг зүйл
-              <select name="sweet" required>
-                <option value="">Сонгох</option>
-                <option value="low">Бага</option>
-                <option value="mid">Дунд</option>
-                <option value="high">Их / бараг өдөр бүр</option>
-              </select>
-            </label>
-            <label>Гурил, будаа, талх, боов
-              <select name="carb" required>
-                <option value="">Сонгох</option>
-                <option value="low">Бага</option>
-                <option value="mid">Дунд</option>
-                <option value="high">Их / хоол бүрт</option>
-              </select>
-            </label>
-            <label>Нойр
-              <select name="sleep" required>
-                <option value="">Сонгох</option>
-                <option value="low">6 цагаас бага</option>
-                <option value="mid">6–7 цаг</option>
-                <option value="good">7–9 цаг</option>
-              </select>
-            </label>
-            <label>Стресс
-              <select name="stress" required>
-                <option value="">Сонгох</option>
-                <option value="low">Бага</option>
-                <option value="mid">Дунд</option>
-                <option value="high">Их</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="section-title">
-            <p>Алхам 3</p>
-            <h2>Танд тохирох төлөвлөгөө</h2>
-          </div>
-
-          <div class="radio-grid">
-            <label class="choice">
-              <input type="radio" name="planType" value="active" required />
-              <span>
-                <strong>Хөдөлгөөнтэй төлөвлөгөө</strong>
-                Алхалт, гэрийн дасгал, хооллолтын зохицуулалттай.
-              </span>
-            </label>
-            <label class="choice">
-              <input type="radio" name="planType" value="lowmove" required />
-              <span>
-                <strong>Хөдөлгөөн багатай төлөвлөгөө</strong>
-                Завгүй, суугаа ажилтай, дасгал хийх боломж багатай хүмүүст.
-              </span>
-            </label>
-            <label class="choice">
-              <input type="radio" name="planType" value="support" required />
-              <span>
-                <strong>Дэмжих бүтээгдэхүүнтэй төлөвлөгөө</strong>
-                Хооллолт, ус, дадал дээр нэмэлт дэмжлэгтэй хувилбар.
-              </span>
-            </label>
-          </div>
-
-          <div class="symptom-box">
-            <p>Одоо илэрч буй зовиур байвал сонгоно уу</p>
-            <div class="check-grid">
-              <label><input type="checkbox" name="signals" value="back" /> Нуруу өвдөх</label>
-              <label><input type="checkbox" name="signals" value="knee" /> Өвдөг өвдөх</label>
-              <label><input type="checkbox" name="signals" value="breath" /> Амьсгаадах</label>
-              <label><input type="checkbox" name="signals" value="sleep" /> Нойр муудах</label>
-              <label><input type="checkbox" name="signals" value="pressure" /> Даралт ихсэх</label>
-              <label><input type="checkbox" name="signals" value="sugar" /> Сахарын асуудал</label>
-              <label><input type="checkbox" name="signals" value="digestion" /> Хоол боловсруулах зовиур</label>
-              <label><input type="checkbox" name="signals" value="none" /> Байхгүй</label>
-            </div>
-          </div>
-
-          <div class="actions sticky-actions">
-            <button class="primary-btn" type="submit">Тайлан гаргах</button>
-            <button class="secondary-btn" type="button" id="demoBtn">Жишээ бөглөх</button>
-          </div>
-        </form>
-
-        <aside class="side-card">
-          <h3>Систем юу гаргах вэ?</h3>
-          <ul>
-            <li>BMI ба жингийн ангилал</li>
-            <li>Бэлхүүс/өндрийн харьцааны анхаарах дохио</li>
-            <li>Жин нэмэхэд нөлөөлж буй гол дадал</li>
-            <li>Хооллолтын хувьчилсан зөвлөмж</li>
-            <li>30 хоногийн өдөрчилсөн төлөвлөгөө</li>
-            <li>Хэвлэх болон PDF болгон хадгалах тайлан</li>
-          </ul>
-          <div class="mini-cta">
-            <strong>Page дээр ашиглах үг</strong>
-            <p>“Өөрийн биеийн өгөгдлөөр 30 хоногийн төлөвлөгөө гаргуулах бол линкээр орж бөглөөрэй.”</p>
-          </div>
-        </aside>
-      </section>
-
-      <section id="report" class="report hidden" aria-live="polite">
-        <div class="report__head">
-          <div>
-            <p class="eyebrow">Хувийн тайлан</p>
-            <h2 id="reportTitle">Биеийн Мэлмий тайлан</h2>
-            <p id="reportMeta"></p>
-          </div>
-          <div class="report-actions">
-            <button class="primary-btn" type="button" id="printBtn">PDF / Хэвлэх</button>
-            <button class="secondary-btn" type="button" id="copyBtn">Хураангуй хуулах</button>
           </div>
         </div>
 
-        <div id="reportContent"></div>
-      </section>
-    </main>
+        <div class="formBlock">
+          <h3>3. Хооллолт ба анхаарах зүйл</h3>
+          <div class="fields">
+            <label>Амттан, чихэрлэг зүйл
+              <select id="sweet" required>
+                <option value="">Сонгох</option>
+                <option value="low">Бага</option>
+                <option value="medium">Дунд</option>
+                <option value="high">Их</option>
+              </select>
+            </label>
+            <label>Гурил, будаа, боов боорцог
+              <select id="carb" required>
+                <option value="">Сонгох</option>
+                <option value="low">Бага</option>
+                <option value="medium">Дунд</option>
+                <option value="high">Их</option>
+              </select>
+            </label>
+            <label>Хийжүүлсэн ундаа, шүүс
+              <select id="drink" required>
+                <option value="">Сонгох</option>
+                <option value="low">Бараг уудаггүй</option>
+                <option value="medium">Хааяа</option>
+                <option value="high">Их уудаг</option>
+              </select>
+            </label>
+            <label>Хоол хийх боломж
+              <select id="cook" required>
+                <option value="">Сонгох</option>
+                <option value="home">Гэртээ хийх боломжтой</option>
+                <option value="mixed">Гэр + гадуур холимог</option>
+                <option value="outside">Ихэвчлэн гадуур</option>
+              </select>
+            </label>
+            <label>Харшилтай / иддэггүй хүнс <input id="avoidFood" type="text" placeholder="байхгүй бол хоосон үлдээнэ" /></label>
+            <label>Эрүүл мэндийн анхаарах зүйл <input id="medical" type="text" placeholder="даралт, сахар, ходоод, жирэмсэн гэх мэт" /></label>
+          </div>
+        </div>
 
-    <footer>
-      <p>Биеийн Мэлмий — ерөнхий мэдээлэл, дадлын төлөвлөгөөний систем. Эмнэлгийн онош, эмчилгээний заавар биш.</p>
-    </footer>
-  </div>
+        <div class="formBlock">
+          <h3>4. Төлөвлөгөөний сонголт</h3>
+          <div class="choiceGrid">
+            <label class="choice"><input type="radio" name="route" value="active" required /> <span>Хөдөлгөөнтэй төлөвлөгөө</span><small>Алхалт, гэрийн хөнгөн дасгалтай</small></label>
+            <label class="choice"><input type="radio" name="route" value="low" /> <span>Хөдөлгөөн багатай төлөвлөгөө</span><small>Суугаа ажилтай, зав багатай хүнд</small></label>
+            <label class="choice"><input type="radio" name="route" value="support" /> <span>Дэмжих бүтээгдэхүүнтэй</span><small>Хооллолт, ус, дадалтай хамт</small></label>
+          </div>
+
+          <div class="choiceGrid packageGrid">
+            <label class="choice"><input type="radio" name="package" value="1" required /> <span>1 сарын төлөвлөгөө</span><small>11,900₮</small></label>
+            <label class="choice"><input type="radio" name="package" value="2" /> <span>2 сарын төлөвлөгөө</span><small>20,500₮</small></label>
+            <label class="choice"><input type="radio" name="package" value="3" /> <span>3 сарын төлөвлөгөө</span><small>30,000₮</small></label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn primary wide">BMI болон урьдчилсан үнэлгээ гаргах</button>
+      </form>
+    </section>
+
+    <section id="result" class="result hidden" aria-live="polite"></section>
+
+    <section class="finalCta imageCard energyBg">
+      <div>
+        <h2>Та өөрөө өөрчлөгдвөл бусдад үлгэр болно</h2>
+        <p>Эрүүл жин бол зөвхөн гоо сайхан биш. Өөрийн биеэ хайрлаж, гэр бүл, найз нөхөддөө зөв дадлын үлгэр дуурайлал болох эхлэл юм.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© Эрүүл Бие — Эрүүл Жин. Энэхүү үнэлгээ нь эмчийн оношилгоо, эмчилгээний зааврыг орлохгүй.</p>
+  </footer>
 
   <script src="app.js"></script>
 </body>
