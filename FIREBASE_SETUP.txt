@@ -1,0 +1,33 @@
+FIREBASE ДЭЭР ТОХИРУУЛАХ ЗААВАР
+
+1. Firebase Console нээнэ.
+2. Add project дарж шинэ project үүсгэнэ.
+3. Build -> Firestore Database -> Create database -> Start in production mode.
+4. Project settings -> Your apps -> Web app үүсгэнэ.
+5. Firebase config-ийг хуулж firebase-config.js дотор солино.
+
+Жишээ:
+const firebaseConfig = {
+  apiKey: "...",
+  authDomain: "...firebaseapp.com",
+  projectId: "...",
+  storageBucket: "...appspot.com",
+  messagingSenderId: "...",
+  appId: "..."
+};
+
+6. Authentication -> Sign-in method -> Google-г Enable болгоно.
+7. Authentication -> Users хэсэгт өөрийн Google-ээр admin.html дээр нэвтэрнэ.
+8. Users хэсгээс өөрийн UID-г copy хийнэ.
+9. Firestore Database -> Rules хэсэгт firestore-rules.txt доторх rules-ийг paste хийнэ.
+10. ADMIN_UID_ЭНД_БИЧНЭ гэдгийг өөрийн UID-ээр солино.
+11. Publish дарна.
+
+АЖИЛЛАХ УРСГАЛ:
+- index.html дээр хэрэглэгч мэдээллээ бөглөөд багц сонгоно.
+- Төлбөрийн хүсэлт Firestore /requests collection руу орно.
+- admin.html дээр админ Google-ээр нэвтэрч хүсэлтээ харна.
+- Мөнгө орсон бол “Мөнгө орсон — Батлах” дарна.
+- Тайлангийн link хуулна.
+- Тэр link-ийг хэрэглэгчийн утасны дугаарт явуулна.
+- report.html?id=... link нь зөвхөн батлагдсаны дараа тайлан харуулна.

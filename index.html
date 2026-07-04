@@ -4,18 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0f766e" />
-  <meta name="description" content="Эрүүл Бие — Эрүүл Жин: Биеийн жингийн индекс, бэлхүүс, амьдралын хэв маягт тулгуурласан урьдчилсан үнэлгээ." />
+  <meta name="description" content="Эрүүл Бие — Эрүүл Жин: Биеийн жингийн индекс ба хувийн төлөвлөгөөний хүсэлт." />
   <title>Эрүүл Бие — Эрүүл Жин</title>
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())).catch(()=>{});
-    }
-    if (window.caches) {
-      caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
-    }
+    if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())).catch(()=>{});
+    if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
   </script>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=11" />
 </head>
 <body>
   <header class="hero">
@@ -23,11 +18,9 @@
     <div class="heroContent">
       <div class="badge">Эхлээд өөрийгөө мэд</div>
       <h1>Эрүүл Бие — Эрүүл Жин</h1>
-      <p class="subtitle">Та олон төрлийн тураах бүтээгдэхүүн хэрэглэсэн ч огт турахгүй байна уу? Кофе, цай, эм, жимс, тариа, наалт гээд олон зүйл хэрэглэсэн ч жин тогтвортой буухгүй байна уу?</p>
-      <p class="subtitle strongLine">Эдгээр бүтээгдэхүүн хаанаас, ямар найрлагатай, таны биед тохирох эсэхийг та үнэхээр мэдэх үү? Эрүүлээр турж, эрүүл амьдралын хэв маягтай болмоор байвал эхлээд өөрийн Биеийн жингийн индексээ тодорхойлуулж зөвлөгөө аваарай.</p>
-      <div class="heroActions">
-        <a href="#form" class="btn primary">Асуумж бөглөх</a>
-      </div>
+      <p class="subtitle">Та олон төрлийн тураах бүтээгдэхүүн хэрэглэсэн ч огт турахгүй байна уу? Кофе, цай, эм, жимс, тариа, наалт гээд олон зүйл туршсан ч жин тогтвортой буухгүй байна уу?</p>
+      <p class="subtitle strongLine">Эрүүлээр турж, эрүүл амьдралын хэв маягтай болмоор байвал эхлээд өөрийн Биеийн жингийн индексээ тодорхойлуулж, өөрийн хариултад тулгуурласан зөв чиглэлээ мэдээрэй.</p>
+      <div class="heroActions"><a href="#form" class="btn primary">Асуумж бөглөх</a></div>
     </div>
   </header>
 
@@ -89,38 +82,26 @@
           <div class="fields">
             <label>Амттан, чихэрлэг зүйл
               <select id="sweet" required>
-                <option value="">Сонгох</option>
-                <option value="low">Бага</option>
-                <option value="medium">Дунд</option>
-                <option value="high">Их</option>
+                <option value="">Сонгох</option><option value="low">Бага</option><option value="medium">Дунд</option><option value="high">Их</option>
               </select>
             </label>
             <label>Гурил, будаа, боов боорцог
               <select id="carb" required>
-                <option value="">Сонгох</option>
-                <option value="low">Бага</option>
-                <option value="medium">Дунд</option>
-                <option value="high">Их</option>
+                <option value="">Сонгох</option><option value="low">Бага</option><option value="medium">Дунд</option><option value="high">Их</option>
               </select>
             </label>
             <label>Хийжүүлсэн ундаа, шүүс
               <select id="drink" required>
-                <option value="">Сонгох</option>
-                <option value="low">Бараг уудаггүй</option>
-                <option value="medium">Хааяа</option>
-                <option value="high">Их уудаг</option>
+                <option value="">Сонгох</option><option value="low">Бараг уудаггүй</option><option value="medium">Хааяа</option><option value="high">Их уудаг</option>
               </select>
             </label>
             <label>Хоол хийх боломж
               <select id="cook" required>
-                <option value="">Сонгох</option>
-                <option value="home">Гэртээ хийх боломжтой</option>
-                <option value="mixed">Гэр + гадуур холимог</option>
-                <option value="outside">Ихэвчлэн гадуур</option>
+                <option value="">Сонгох</option><option value="home">Гэртээ хийх боломжтой</option><option value="mixed">Гэр + гадуур холимог</option><option value="outside">Ихэвчлэн гадуур</option>
               </select>
             </label>
             <label>Иддэггүй / харшилтай хүнс <input id="avoidFood" type="text" placeholder="байхгүй бол хоосон үлдээнэ" /></label>
-            <label>Эрүүл мэндийн анхаарах зүйл <input id="medical" type="text" placeholder="даралт, сахар, ходоод, жирэмсэн гэх мэт" /></label>
+            <label>Эрүүл мэндийн анхаарах зүйл <input id="medical" type="text" placeholder="байхгүй бол хоосон үлдээнэ" /></label>
           </div>
         </div>
 
@@ -140,10 +121,10 @@
     <section id="result" class="result hidden" aria-live="polite"></section>
   </main>
 
-  <footer>
-    <p>© Эрүүл Бие — Эрүүл Жин</p>
-  </footer>
-
-  <script src="app.js?v=8"></script>
+  <footer><p>© Эрүүл Бие — Эрүүл Жин</p></footer>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js?v=11"></script>
+  <script src="app.js?v=11"></script>
 </body>
 </html>

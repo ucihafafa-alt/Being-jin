@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Админ — Эрүүл Бие Эрүүл Жин</title>
+  <link rel="stylesheet" href="style.css?v=11" />
+</head>
+<body>
+  <main class="adminPage">
+    <section class="formWrap">
+      <div class="sectionTitle compactTitle">
+        <span>Админ хэсэг</span>
+        <h2>Төлбөрийн хүсэлтүүд</h2>
+        <p>Хүсэлтийг шалгаад мөнгө орсон бол “Батлах” дарна. Баталсны дараа тайлангийн link үүснэ. Тэр link-ийг хэрэглэгчийн утасны дугаар руу явуулна.</p>
+      </div>
+      <div class="adminTools">
+        <div id="loginState" class="fineprint">Админ нэвтрэлт шалгаж байна...</div>
+        <button class="btn primary" onclick="loadRequests()">Хүсэлтүүд шинэчлэх</button>
+      </div>
+      <div id="adminStatus" class="fineprint"></div>
+      <div id="requestList" class="requestList"></div>
+    </section>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js?v=11"></script>
+  <script src="admin.js?v=11"></script>
+</body>
+</html>

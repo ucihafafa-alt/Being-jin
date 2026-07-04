@@ -1,6 +1,18 @@
 const $ = (id) => document.getElementById(id);
 const result = $('result');
 let lastReport = null;
+let lastSelectedPackageKey = null;
+
+const PAYMENT_CONFIG = {
+  backend: 'firebase',
+  reportBaseUrl: 'https://ucihafafa-alt.github.io/Being-jin/report.html',
+  accounts: [
+    { bank: 'ХААН банк', holder: 'ДАНСНЫ НЭР ЭНД БИЧНЭ', number: 'ДАНСНЫ ДУГААР ЭНД БИЧНЭ', link: '' },
+    { bank: 'Голомт банк', holder: 'ДАНСНЫ НЭР ЭНД БИЧНЭ', number: 'ДАНСНЫ ДУГААР ЭНД БИЧНЭ', link: '' },
+    { bank: 'Худалдаа хөгжлийн банк', holder: 'ДАНСНЫ НЭР ЭНД БИЧНЭ', number: 'ДАНСНЫ ДУГААР ЭНД БИЧНЭ', link: '' },
+    { bank: 'Төрийн банк', holder: 'ДАНСНЫ НЭР ЭНД БИЧНЭ', number: 'ДАНСНЫ ДУГААР ЭНД БИЧНЭ', link: '' }
+  ]
+};
 
 const packageInfo = {
   '1': { months: 1, title: '1 сарын эхлэл', price: '11,900₮', desc: '30 хоногийн энгийн хооллолт, ус, нойр, хөдөлгөөний суурь төлөвлөгөө.' },
@@ -262,46 +274,162 @@ window.showPackages = function(){
     </div>
     <div id="paymentBox" class="paymentBox hidden"></div>
     <textarea class="copyArea hidden" id="copyArea" readonly placeholder="Багц сонгоход хураангуй энд гарна"></textarea>
-    <p class="fineprint">Сонгосон багцаа төлөөд энэ хэсгээс PDF тайлангаа хэвлэж эсвэл хадгалж авна.</p>
+    <p class="fineprint">Багцаа сонгоод төлбөрийн хүсэлтээ системээр админ руу илгээнэ. Админ мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоос таны утасны дугаарт очно.</p>
   `;
   area.scrollIntoView({behavior:'smooth', block:'start'});
 };
 
+
+function bankOptionsHtml(){
+  return PAYMENT_CONFIG.accounts.map((acc, idx) => `
+    <label class="bankChoice">
+      <input type="radio" name="payBank" value="${idx}" ${idx === 0 ? 'checked' : ''} onchange="updateBankDetails()" />
+      <span>${escapeHtml(acc.bank)}</span>
+    </label>
+  `).join('');
+}
+
+function selectedPaymentBank(){
+  const idx = Number(document.querySelector('input[name="payBank"]:checked')?.value || 0);
+  return PAYMENT_CONFIG.accounts[idx] || PAYMENT_CONFIG.accounts[0];
+}
+
+function bankDetailsHtml(acc){
+  const linkPart = acc.link ? `<a class="bankLink" href="${escapeHtml(acc.link)}" target="_blank" rel="noopener">${escapeHtml(acc.bank)} апп / холбоос нээх</a>` : `<span class="bankLink mutedLink">Банкны холбоосыг app.js дотор нэмнэ</span>`;
+  return `
+    <div class="invoiceLine"><span>Сонгосон банк</span><b>${escapeHtml(acc.bank)}</b></div>
+    <div class="invoiceLine"><span>Дансны нэр</span><b>${escapeHtml(acc.holder)}</b></div>
+    <div class="invoiceLine"><span>Дансны дугаар</span><b>${escapeHtml(acc.number)}</b></div>
+    <div class="invoiceLine"><span>Банкны холбоос</span>${linkPart}</div>
+  `;
+}
+
+window.updateBankDetails = function(){
+  const holder = $('bankDetails');
+  if (holder) holder.innerHTML = bankDetailsHtml(selectedPaymentBank());
+};
+
+
+function buildRequestObject(phone, bank){
+  if (!lastReport || !lastSelectedPackageKey) return null;
+  const { data, bmi, risk, route, targetLoss } = lastReport;
+  const pack = packageInfo[lastSelectedPackageKey];
+  const id = `EBEJ-${Date.now()}-${Math.random().toString(36).slice(2,7).toUpperCase()}`;
+  return {
+    id,
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+    phone,
+    bank,
+    packageKey: lastSelectedPackageKey,
+    packageTitle: pack.title,
+    packagePrice: pack.price,
+    packageMonths: pack.months,
+    data,
+    bmi: round(bmi,1),
+    category: risk.level,
+    routeTitle: route.title,
+    routeNote: route.note,
+    targetLoss: round(targetLoss,1),
+    reportBaseUrl: PAYMENT_CONFIG.reportBaseUrl
+  };
+}
+
+function buildPaymentRequest(phone, bank){
+  const req = buildRequestObject(phone, bank);
+  if (!req) return '';
+  const d = req.data;
+  return `Эрүүл Бие — Эрүүл Жин төлбөрийн хүсэлт\n\nХүсэлтийн дугаар: ${req.id}\nНэр: ${d.name}\nУтас: ${phone}\nСонгосон багц: ${req.packageTitle}\nТөлөх дүн: ${req.packagePrice}\nТөлсөн банк: ${bank.bank}\nГүйлгээний утга: ${d.name} - ${phone} - ${req.packageMonths} сар\n\nТайлангийн мэдээлэл\nНас: ${d.age}\nХүйс: ${showVal(d.gender)}\nӨндөр: ${d.height} см\nОдоогийн жин: ${d.weight} кг\nЗорилтот жин: ${d.targetWeight} кг\nХасахыг хүсэж буй жин: ${req.targetLoss} кг\nБэлхүүс: ${d.waist || 'бичээгүй'} см\nБиеийн жингийн индекс: ${req.bmi} — ${req.category}\nСонгосон хэлбэр: ${req.routeTitle}\n\nАдмин мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоосыг энэ дугаарт илгээнэ.`;
+}
+
+function storeLocalRequest(req){
+  const key = 'ebej_admin_requests';
+  const list = JSON.parse(localStorage.getItem(key) || '[]');
+  list.unshift(req);
+  localStorage.setItem(key, JSON.stringify(list));
+}
+
+async function sendRequestToAdmin(req){
+  if (window.EBEJ_FIREBASE_READY && window.EBEJ_DB) {
+    await window.EBEJ_DB.collection('requests').doc(req.id).set(req);
+    return { ok:true, firebase:true };
+  }
+  storeLocalRequest(req);
+  return { ok:true, local:true };
+}
+
+
+window.copyBankInfo = async function(){
+  const bank = selectedPaymentBank();
+  const text = `Банк: ${bank.bank}\nДансны нэр: ${bank.holder}\nДансны дугаар: ${bank.number}`;
+  try { await navigator.clipboard.writeText(text); alert('Дансны мэдээлэл хууллаа.'); }
+  catch(e){ alert(text); }
+};
+
+window.submitPaymentRequest = async function(){
+  const phone = String($('payerPhone')?.value || '').trim();
+  if (phone.length < 6) { alert('Тайлангийн холбоос авах утасны дугаараа зөв бичнэ үү.'); return; }
+  const bank = selectedPaymentBank();
+  const req = buildRequestObject(phone, bank);
+  const requestText = buildPaymentRequest(phone, bank);
+  if ($('copyArea')) $('copyArea').value = requestText;
+  try { await sendRequestToAdmin(req); } catch(e) { alert('Хүсэлт илгээхэд алдаа гарлаа. Интернэт эсвэл админ тохиргоогоо шалгана уу.'); return; }
+  try { await navigator.clipboard.writeText(requestText); } catch(e) {}
+  const sent = $('requestSent');
+  if (sent) sent.classList.remove('hidden');
+  alert('Хүсэлт системийн админ хэсэг рүү илгээгдлээ. Админ мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоос таны дугаарт очно.');
+};
+
 window.selectPackage = function(key){
   if (!lastReport) return;
+  lastSelectedPackageKey = key;
   const { data, bmi, risk, route, targetLoss } = lastReport;
   const pack = packageInfo[key];
-  const text = `Эрүүл Бие — Эрүүл Жин тайлан\n\nНэр: ${data.name}\nНас: ${data.age}\nХүйс: ${showVal(data.gender)}\nӨндөр: ${data.height} см\nОдоогийн жин: ${data.weight} кг\nЗорилтот жин: ${data.targetWeight} кг\nХасахыг хүсэж буй жин: ${round(targetLoss,1)} кг\nБэлхүүс: ${data.waist || 'бичээгүй'} см\nБиеийн жингийн индекс: ${round(bmi,1)} — ${risk.level}\n\nСонгосон хэлбэр: ${route.title}\nСонгосон багц: ${pack.title} — ${pack.price}\n\nСуугаа цаг: ${data.sittingHours}\nНойр: ${data.sleepHours} цаг\nУс: ${data.waterLiters} литр\nХооллох тоо: ${data.meals}\nОройн хоол: ${showVal(data.lastMeal)}\nАмттан: ${showVal(data.sweet)}\nГурил/будаа: ${showVal(data.carb)}\nУндаа/шүүс: ${showVal(data.drink)}\nХоол хийх боломж: ${showVal(data.cook)}\nИддэггүй/харшилтай хүнс: ${data.avoidFood}\nЭрүүл мэндийн анхаарах зүйл: ${data.medical}\n\n${pack.months} сарын багцын төлөвлөгөө PDF хэлбэрээр авна.`;
-  $('copyArea').value = text;
+  const defaultPhone = '';
+  const summary = `Эрүүл Бие — Эрүүл Жин төлбөрийн хүсэлт\n\nНэр: ${data.name}\nУтас: ${defaultPhone}\nСонгосон багц: ${pack.title}\nТөлөх дүн: ${pack.price}\nБиеийн жингийн индекс: ${round(bmi,1)} — ${risk.level}`;
+  $('copyArea').value = summary;
   const pay = $('paymentBox');
   pay.classList.remove('hidden');
   pay.innerHTML = `
-    <h3>Төлбөр төлөөд PDF тайлан авах</h3>
-    <p><b>${escapeHtml(data.name)}</b>, таны сонгосон багц: <b>${escapeHtml(pack.title)}</b></p>
+    <h3>Төлбөрийн хүсэлт админ руу илгээх</h3>
+    <p><b>${escapeHtml(data.name)}</b>, таны сонгосон багц: <b>${escapeHtml(pack.title)}</b>. Доорх дансаар төлбөрөө хийгээд утасны дугаараа бичиж хүсэлтээ админ руу илгээнэ. Админ мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоос таны оруулсан дугаарт очно.</p>
     <div class="invoiceGrid">
       <div class="invoiceLine"><span>Төлөх дүн</span><b>${escapeHtml(pack.price)}</b></div>
-      <div class="invoiceLine"><span>Гүйлгээний утга</span><b>${escapeHtml(data.name)} - ${escapeHtml(pack.title)}</b></div>
-      <div class="invoiceLine"><span>Дансны мэдээлэл</span><b>Энд өөрийн дансны нэр, дугаараа бичнэ</b></div>
+      <div class="invoiceLine"><span>Гүйлгээний утга</span><b>${escapeHtml(data.name)} - утасны дугаар - ${pack.months} сар</b></div>
     </div>
-    <p class="smallNote">Дансны мэдээллийг өөрийн банкны дансаар солино. Төлбөрийн дараа доорх товчоор тайлангаа PDF болгон хадгална.</p>
-    <div class="askActions">
-      <button class="btn primary" type="button" onclick="markPaid()">Төлбөр төлсөн — PDF тайлан авах</button>
-      <button class="btn secondary" type="button" onclick="copyOrder()">Хураангуй хуулах</button>
+
+    <div class="paymentForm">
+      <label>Тайлангийн холбоос авах утасны дугаар
+        <input id="payerPhone" type="tel" inputmode="tel" placeholder="Жишээ: 99112233" required />
+      </label>
+
+      <div class="bankSelectTitle">Төлбөр хийх банкаа сонгоно уу</div>
+      <div class="bankGrid">${bankOptionsHtml()}</div>
+
+      <div id="bankDetails" class="invoiceGrid bankDetails">${bankDetailsHtml(PAYMENT_CONFIG.accounts[0])}</div>
+
+      <div class="askActions">
+        <button class="btn secondary" type="button" onclick="copyBankInfo()">Дансны мэдээлэл хуулах</button>
+        <button class="btn primary" type="button" onclick="submitPaymentRequest()">Админд хүсэлт илгээх</button>
+      </div>
+
+      <div id="requestSent" class="pdfReady hidden">
+        Таны хүсэлт системийн админ хэсэг рүү илгээгдлээ. Админ мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоос таны утасны дугаарт очно.
+        <div class="askActions">
+          <button class="btn light" type="button" onclick="copyOrder()">Хүсэлт дахин хуулах</button>
+        </div>
+      </div>
     </div>
-    <div id="pdfReady" class="pdfReady hidden">PDF авахад бэлэн. Гар утасны хэвлэх цонхноос “Save as PDF” сонгоорой.<div class="askActions"><button class="btn primary" type="button" onclick="window.print()">PDF / Хэвлэх</button></div></div>
+
+    <p class="smallNote">Энэ хэсгээс шууд PDF татахгүй. Эхлээд системээр хүсэлт админ руу илгээгдэнэ. Админ баталгаажуулсны дараа тайлангийн холбоос таны утасны дугаарт очно.</p>
   `;
   pay.scrollIntoView({behavior:'smooth', block:'start'});
-};
-
-window.markPaid = function(){
-  const box = $('pdfReady');
-  if (box) box.classList.remove('hidden');
 };
 
 window.copyOrder = async function(){
   const text = $('copyArea')?.value || '';
   if (!text) { alert('Эхлээд багцаа сонгоно уу.'); return; }
-  try { await navigator.clipboard.writeText(text); alert('Хураангуй хууллаа.'); }
+  try { await navigator.clipboard.writeText(text); alert('Хүсэлт хууллаа.'); }
   catch(e){ alert('Хуулж чадсангүй. Текстийг гараар copy хийнэ үү.'); }
 };
 
