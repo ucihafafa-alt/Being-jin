@@ -1,9 +1,16 @@
+
+// v19: old PWA cache killer
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister())).catch(()=>{});
+  if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
+}
+
 const ADMIN_CONFIG = {
   reportBaseUrl: 'https://ucihafafa-alt.github.io/Being-jin/report.html'
 };
 const $ = (id) => document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
-function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=18`;}
+function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=19`;}
 function setStatus(t){$('adminStatus').textContent=t;}
 function localRequests(){return JSON.parse(localStorage.getItem('ebej_admin_requests') || '[]');}
 function isFirebaseReady(){return window.EBEJ_FIREBASE_READY && window.EBEJ_DB && window.EBEJ_AUTH;}
@@ -67,8 +74,10 @@ function render(list){
       <div class="askActions">
         ${approved?`<button class="btn light" disabled>Мөнгө батлагдсан</button>`:`<button class="btn primary" onclick="approve('${esc(id)}')">Мөнгө орсон — Батлах</button>`}
         <button class="btn secondary" onclick="copyLink('${esc(link)}')">Тайлангийн link хуулах</button>
-        <button class="btn light" onclick="copySms('${esc(link)}','${esc(d.name||'')}','${esc(req.phone||'')}')">Текст хуулах</button>
-        <button class="btn primary" onclick="openSms('${encodeURIComponent(req.phone||'')}','${encodeURIComponent(link)}','${encodeURIComponent(d.name||'')}')">SMS апп нээж дугаарт илгээх</button>
+        <a class="btn light" href="${esc(link)}" target="_blank" rel="noopener">Тайлан харах</a>
+        <button class="btn light" onclick="copySms('${esc(link)}','${esc(d.name||'')}','${esc(req.phone||'')}')">Дугаарт явуулах текст хуулах</button>
+        <button class="btn primary" onclick="openSms('${encodeURIComponent(req.phone||'')}','${encodeURIComponent(link)}','${encodeURIComponent(d.name||'')}','sms')">SMS нээх</button>
+        <button class="btn secondary" onclick="openSms('${encodeURIComponent(req.phone||'')}','${encodeURIComponent(link)}','${encodeURIComponent(d.name||'')}','smsto')">SMS нөөц хувилбар</button>
       </div>
       <div class="linkBox"><span>Тайлангийн холбоос</span><b>${esc(link)}</b></div>
       <textarea readonly class="copyArea smsArea">${esc(msg)}</textarea>
@@ -110,20 +119,24 @@ window.copySms = async function(link,name,phone){
   await navigator.clipboard.writeText(msg).catch(()=>{});
   alert('Дугаарт явуулах текст хууллаа. Утас: '+(phone||''));
 };
-window.openSms = function(phoneEnc, linkEnc, nameEnc){
+
+window.openSms = function(phoneEnc, linkEnc, nameEnc, mode='sms'){
   const phone = decodeURIComponent(phoneEnc || '').replace(/[^0-9+]/g,'');
   const link = decodeURIComponent(linkEnc || '');
   const name = decodeURIComponent(nameEnc || '');
   const msg = reportMessage(link, name, phone);
   if(!phone){
-    alert('Хэрэглэгчийн утасны дугаар алга байна. Эхлээд link-ээ хуулж гараар явуул.');
+    alert('Хэрэглэгчийн утасны дугаар алга. Эхлээд текстээ хуулж гараар явуул.');
+    navigator.clipboard.writeText(msg).catch(()=>{});
     return;
   }
-  // Android дээр SMS app-ийг дугаар болон тексттэй нь нээнэ. Автоматаар илгээхгүй, Send-ийг админ өөрөө дарна.
-  const smsUrl = `sms:${phone}?body=${encodeURIComponent(msg)}`;
   navigator.clipboard.writeText(msg).catch(()=>{});
+  const body = encodeURIComponent(msg);
+  // Android дээр browser бүр өөрөөр ажилладаг тул 2 scheme дэмжив.
+  const smsUrl = mode === 'smsto' ? `smsto:${phone}?body=${body}` : `sms:${phone}?body=${body}`;
   window.location.href = smsUrl;
 };
+
 
 window.signInAdmin = signInAdmin;
 window.signOutAdmin = signOutAdmin;

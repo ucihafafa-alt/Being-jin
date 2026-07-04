@@ -1,3 +1,10 @@
+
+// v19: old PWA cache killer
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister())).catch(()=>{});
+  if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
+}
+
 const $ = (id) => document.getElementById(id);
 const result = $('result');
 let lastReport = null;
@@ -294,8 +301,8 @@ window.showPackages = function(){
 
 function makeIntentLink(app){
   const pkg = app.packageId || '';
-  // Chrome/Android дээр Play Store руу үсрүүлэхгүй, шууд launcher intent ашиглана.
-  return `intent://open#Intent;scheme=android-app;package=${pkg};action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end`;
+  // Android: browser шууд app нээж чадахгүй бол Play Store руу үсэрч магадгүй. Энэ нь банкны app-н албан deep link байхгүйгээс болно.
+  return `intent://#Intent;package=${pkg};action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end`;
 }
 
 function bankTilesHtml(){
