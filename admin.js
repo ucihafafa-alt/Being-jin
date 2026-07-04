@@ -3,7 +3,7 @@ const ADMIN_CONFIG = {
 };
 const $ = (id) => document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
-function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=13`;}
+function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=16`;}
 function setStatus(t){$('adminStatus').textContent=t;}
 function localRequests(){return JSON.parse(localStorage.getItem('ebej_admin_requests') || '[]');}
 function isFirebaseReady(){return window.EBEJ_FIREBASE_READY && window.EBEJ_DB && window.EBEJ_AUTH;}
@@ -25,25 +25,20 @@ async function signOutAdmin(){ if(window.EBEJ_AUTH) await window.EBEJ_AUTH.signO
 
 async function loadRequests(){
   if(!isFirebaseReady()){
-    setStatus('Firebase тохиргоо хийгдээгүй байна. Одоогоор зөвхөн энэ төхөөрөмж дээр хадгалсан local хүсэлтүүд харагдана.');
-    render(localRequests());
-    return;
-  }
-  const user = window.EBEJ_AUTH.currentUser;
-  if(!user){
-    setStatus('Админ Google аккаунтаар нэвтэрнэ үү.');
+    setStatus('Firebase тохиргоо хийгдээгүй байна. firebase-config.js-ээ шалга.');
     render([]);
     return;
   }
-  setStatus('Firebase-ээс хүсэлтүүд татаж байна...');
+  const user = window.EBEJ_AUTH.currentUser;
+  setStatus(user ? `Firebase-ээс хүсэлтүүд татаж байна... Нэвтэрсэн: ${user.email}` : 'Firebase-ээс хүсэлтүүд татаж байна... /түр нээлттэй rules байвал loginгүй уншина/');
   try{
     const snap = await window.EBEJ_DB.collection('requests').orderBy('createdAt','desc').limit(200).get();
     const list = snap.docs.map(d => ({...d.data(), id: d.id}));
-    setStatus(`Нийт ${list.length} хүсэлт байна. Нэвтэрсэн: ${user.email}`);
+    setStatus(user ? `Нийт ${list.length} хүсэлт байна. Нэвтэрсэн: ${user.email}` : `Нийт ${list.length} хүсэлт байна. /Rules нээлттэй горим/`);
     render(list);
   }catch(e){
     console.error(e);
-    setStatus('Хүсэлт татахад алдаа гарлаа. Firestore rules дээр админ UID зөв оруулсан эсэхээ шалга.');
+    setStatus('Хүсэлт татахад алдаа гарлаа. Firestore → Rules дээр түр allow read/update true тавьсан эсэхээ шалга.');
   }
 }
 
@@ -74,12 +69,13 @@ function render(list){
 window.approve = async function(id){
   if(!id){alert('ID алга'); return;}
   const link = reportLink(id);
-  if(isFirebaseReady() && window.EBEJ_AUTH.currentUser){
+  if(isFirebaseReady()){
     try{
+      const user = window.EBEJ_AUTH.currentUser;
       await window.EBEJ_DB.collection('requests').doc(id).update({
         status:'approved',
         approvedAt: new Date().toISOString(),
-        approvedBy: window.EBEJ_AUTH.currentUser.email || '',
+        approvedBy: user ? (user.email || '') : 'admin',
         reportLink: link
       });
       await navigator.clipboard.writeText(link).catch(()=>{});
@@ -87,7 +83,7 @@ window.approve = async function(id){
       loadRequests();
     }catch(e){
       console.error(e);
-      alert('Батлахад алдаа гарлаа. Firestore rules / admin UID тохиргоогоо шалга.');
+      alert('Батлахад алдаа гарлаа. Firestore Rules дээр update зөвшөөрсөн эсэхээ шалга.');
     }
     return;
   }

@@ -10,7 +10,7 @@
     if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())).catch(()=>{});
     if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
   </script>
-  <link rel="stylesheet" href="style.css?v=15" />
+  <link rel="stylesheet" href="style.css?v=16" />
 </head>
 <body>
   <header class="hero">
@@ -124,7 +124,7 @@
   <footer><p>© Эрүүл Бие — Эрүүл Жин</p></footer>
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
-  <script src="firebase-config.js?v=15"></script>
-  <script src="app.js?v=15"></script>
+  <script src="firebase-config.js?v=16"></script>
+  <script src="app.js?v=16"></script>
 </body>
 </html>

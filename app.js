@@ -2,6 +2,7 @@ const $ = (id) => document.getElementById(id);
 const result = $('result');
 let lastReport = null;
 let lastSelectedPackageKey = null;
+let lastPaymentBankIndex = 0;
 
 const PAYMENT_CONFIG = {
   backend: 'firebase',
@@ -10,14 +11,18 @@ const PAYMENT_CONFIG = {
   receiverBank: 'ХААН Банк',
   accountNumber: '5680034540',
   bankCode: '59000500',
-  // Доорх товчууд нь хэрэглэгчийн сонгосон банкны аппыг Android дээр нээх оролдлого хийнэ.
-  // Данс/дүн/утгыг автоматаар бөглөх бол тухайн банкны merchant deep link эсвэл QPay шаардлагатай.
+  // Доорх товчууд банкны аппыг нээх зориулалттай. Данс/дүн автоматаар бөглөх бол QPay/merchant deep link шаардлагатай.
   bankApps: [
-    { bank: 'ХААН Банк', packageId: 'com.khanbank.retail', playUrl: 'https://play.google.com/store/apps/details?id=com.khanbank.retail' },
-    { bank: 'Төрийн банк', packageId: 'com.statebank.gyalsbank', playUrl: 'https://play.google.com/store/apps/details?id=com.statebank.gyalsbank' },
-    { bank: 'ХасБанк', packageId: 'com.xacbank.mobile', playUrl: 'https://play.google.com/store/apps/details?id=com.xacbank.mobile' },
-    { bank: 'Худалдаа хөгжлийн банк', packageId: 'mn.tdb.pay', playUrl: 'https://play.google.com/store/apps/details?id=mn.tdb.pay' },
-    { bank: 'Голомт банк', packageId: 'mn.egolomt.new.bank', playUrl: 'https://play.google.com/store/apps/details?id=mn.egolomt.new.bank' }
+    { key:'khan', bank:'Хаан банк', short:'ХААН', packageId:'com.khanbank.retail', playUrl:'https://play.google.com/store/apps/details?id=com.khanbank.retail' },
+    { key:'golomt', bank:'Голомт', short:'G', packageId:'mn.egolomt.new.bank', playUrl:'https://play.google.com/store/apps/details?id=mn.egolomt.new.bank' },
+    { key:'tdb', bank:'TDB', short:'TDB', packageId:'mn.tdb.pay', playUrl:'https://play.google.com/store/apps/details?id=mn.tdb.pay' },
+    { key:'xac', bank:'Хас банк', short:'XAC', packageId:'com.xacbank.mobile', playUrl:'https://play.google.com/store/apps/details?id=com.xacbank.mobile' },
+    { key:'state', bank:'Төрийн банк', short:'ТӨР', packageId:'com.statebank.gyalsbank', playUrl:'https://play.google.com/store/apps/details?id=com.statebank.gyalsbank' },
+    { key:'mbank', bank:'M bank', short:'M', packageId:'mn.mbank.app', playUrl:'https://play.google.com/store/search?q=M%20bank%20mongolia&c=apps' },
+    { key:'bogd', bank:'Богд банк', short:'БОГД', packageId:'mn.bogdbank.smartbank', playUrl:'https://play.google.com/store/search?q=Bogd%20Bank&c=apps' },
+    { key:'arig', bank:'Ариг банк', short:'АРИГ', packageId:'mn.arigbank.mobile', playUrl:'https://play.google.com/store/search?q=Arig%20Bank&c=apps' },
+    { key:'sono', bank:'Sono', short:'SONO', packageId:'mn.sono.app', playUrl:'https://play.google.com/store/search?q=Sono%20mongolia&c=apps' },
+    { key:'payon', bank:'PayOn', short:'PayOn', packageId:'mn.payon.app', playUrl:'https://play.google.com/store/search?q=PayOn%20mongolia&c=apps' }
   ]
 };
 
@@ -288,45 +293,55 @@ window.showPackages = function(){
 
 
 function makeIntentLink(app){
-  const fallback = encodeURIComponent(app.playUrl);
+  const fallback = encodeURIComponent(app.playUrl || 'https://play.google.com/store');
   return `intent://#Intent;package=${app.packageId};S.browser_fallback_url=${fallback};end`;
 }
 
-function bankOptionsHtml(){
+function bankTilesHtml(){
   return PAYMENT_CONFIG.bankApps.map((app, idx) => `
-    <label class="bankChoice">
-      <input type="radio" name="payBank" value="${idx}" ${idx === 0 ? 'checked' : ''} onchange="updateBankDetails()" />
-      <span>${escapeHtml(app.bank)}</span>
-    </label>
+    <button class="payBankTile ${idx === lastPaymentBankIndex ? 'active' : ''}" type="button" onclick="openBankAppByIndex(${idx})" aria-label="${escapeHtml(app.bank)} апп нээх">
+      <span class="bankLogoText ${escapeHtml(app.key)}">${escapeHtml(app.short)}</span>
+      <b>${escapeHtml(app.bank)}</b>
+    </button>
   `).join('');
 }
 
 function selectedPaymentBank(){
-  const idx = Number(document.querySelector('input[name="payBank"]:checked')?.value || 0);
-  return PAYMENT_CONFIG.bankApps[idx] || PAYMENT_CONFIG.bankApps[0];
+  return PAYMENT_CONFIG.bankApps[lastPaymentBankIndex] || PAYMENT_CONFIG.bankApps[0];
 }
 
-function bankDetailsHtml(app){
+function bankDetailsHtml(){
+  const d = lastReport?.data || {};
+  const pack = packageInfo[lastSelectedPackageKey] || {};
+  const phone = String($('payerPhone')?.value || '').trim() || 'утасны дугаар';
   return `
-    <div class="invoiceLine"><span>Төлөх банкны апп</span><b>${escapeHtml(app.bank)}</b></div>
-    <div class="invoiceLine"><span>Хүлээн авах банк</span><b>${escapeHtml(PAYMENT_CONFIG.receiverBank)}</b></div>
-    <div class="invoiceLine"><span>Хүлээн авагч</span><b>${escapeHtml(PAYMENT_CONFIG.receiverName)}</b></div>
-    <div class="invoiceLine"><span>Дансны дугаар</span><b>${escapeHtml(PAYMENT_CONFIG.accountNumber)}</b></div>
-    <div class="invoiceLine"><span>Банкны код</span><b>${escapeHtml(PAYMENT_CONFIG.bankCode || '')}</b></div>
-    <div class="invoiceLine"><span>Апп</span><button class="bankLink asButton" type="button" onclick="openBankApp()">${escapeHtml(app.bank)} апп нээх</button></div>
+    <div class="payAccountTop">
+      <div>Хүлээн авагч: <b>${escapeHtml(PAYMENT_CONFIG.receiverName)}</b></div>
+      <div>Хүлээн авах банк: <b>${escapeHtml(PAYMENT_CONFIG.receiverBank)}</b></div>
+      <div>Данс: <b>${escapeHtml(PAYMENT_CONFIG.accountNumber)}</b> · Код: <b>${escapeHtml(PAYMENT_CONFIG.bankCode || '')}</b></div>
+      <div>Гүйлгээний утга: <b>${escapeHtml(d.name || '')} - ${escapeHtml(phone)} - ${escapeHtml(pack.months || '')} сар</b></div>
+    </div>
   `;
 }
 
 window.updateBankDetails = function(){
   const holder = $('bankDetails');
-  if (holder) holder.innerHTML = bankDetailsHtml(selectedPaymentBank());
+  if (holder) holder.innerHTML = bankDetailsHtml();
 };
 
-window.openBankApp = function(){
+window.openBankAppByIndex = async function(idx){
+  lastPaymentBankIndex = Number(idx) || 0;
+  updateBankDetails();
+  const grid = $('bankTiles');
+  if (grid) grid.innerHTML = bankTilesHtml();
+  await copyBankInfo(false);
   const app = selectedPaymentBank();
   window.location.href = makeIntentLink(app);
 };
 
+window.openBankApp = function(){
+  window.openBankAppByIndex(lastPaymentBankIndex);
+};
 
 function buildRequestObject(phone, bank){
   if (!lastReport || !lastSelectedPackageKey) return null;
@@ -361,11 +376,11 @@ function buildPaymentRequest(phone, bank){
   const req = buildRequestObject(phone, bank);
   if (!req) return '';
   const d = req.data;
-  return `Эрүүл Бие — Эрүүл Жин төлбөрийн хүсэлт\n\nХүсэлтийн дугаар: ${req.id}\nНэр: ${d.name}\nУтас: ${phone}\nСонгосон багц: ${req.packageTitle}\nТөлөх дүн: ${req.packagePrice}\nТөлөхөөр сонгосон банкны апп: ${bank.bank}
+  return `Эрүүл Бие — Эрүүл Жин төлбөрийн хүсэлт\n\nХүсэлтийн дугаар: ${req.id}\nНэр: ${d.name}\nУтас: ${phone}\nСонгосон багц: ${req.packageTitle}\nТөлөх дүн: ${req.packagePrice}\nАпп нээсэн банк: ${bank.bank}
 Хүлээн авах банк: ${PAYMENT_CONFIG.receiverBank}
 Хүлээн авагч: ${PAYMENT_CONFIG.receiverName}
 Дансны дугаар: ${PAYMENT_CONFIG.accountNumber}
-Банкны код: ${PAYMENT_CONFIG.bankCode || ''}\nГүйлгээний утга: ${d.name} - ${phone} - ${req.packageMonths} сар\n\nТайлангийн мэдээлэл\nНас: ${d.age}\nХүйс: ${showVal(d.gender)}\nӨндөр: ${d.height} см\nОдоогийн жин: ${d.weight} кг\nЗорилтот жин: ${d.targetWeight} кг\nХасахыг хүсэж буй жин: ${req.targetLoss} кг\nБэлхүүс: ${d.waist || 'бичээгүй'} см\nБиеийн жингийн индекс: ${req.bmi} — ${req.category}\nСонгосон хэлбэр: ${req.routeTitle}\n\nАдмин мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоосыг энэ дугаарт илгээнэ.`;
+Код: ${PAYMENT_CONFIG.bankCode || ''}\nГүйлгээний утга: ${d.name} - ${phone} - ${req.packageMonths} сар\n\nТайлангийн мэдээлэл\nНас: ${d.age}\nХүйс: ${showVal(d.gender)}\nӨндөр: ${d.height} см\nОдоогийн жин: ${d.weight} кг\nЗорилтот жин: ${d.targetWeight} кг\nХасахыг хүсэж буй жин: ${req.targetLoss} кг\nБэлхүүс: ${d.waist || 'бичээгүй'} см\nБиеийн жингийн индекс: ${req.bmi} — ${req.category}\nСонгосон хэлбэр: ${req.routeTitle}\n\nАдмин мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоосыг энэ дугаарт илгээнэ.`;
 }
 
 function storeLocalRequest(req){
@@ -376,28 +391,30 @@ function storeLocalRequest(req){
 }
 
 async function sendRequestToAdmin(req){
-  if (window.EBEJ_FIREBASE_READY && window.EBEJ_DB) {
-    await window.EBEJ_DB.collection('requests').doc(req.id).set(req);
-    return { ok:true, firebase:true };
+  if (!window.EBEJ_FIREBASE_READY || !window.EBEJ_DB) {
+    throw new Error('Firebase холбогдоогүй байна. firebase-config.js болон интернэт холболтоо шалга.');
   }
-  storeLocalRequest(req);
-  return { ok:true, local:true };
+  await window.EBEJ_DB.collection('requests').doc(req.id).set(req);
+  const check = await window.EBEJ_DB.collection('requests').doc(req.id).get();
+  if (!check.exists) throw new Error('Хүсэлт хадгалагдсангүй. Firestore Rules-ээ шалга.');
+  return { ok:true, firebase:true };
 }
 
 
-window.copyBankInfo = async function(){
-  const bank = selectedPaymentBank();
+window.copyBankInfo = async function(showAlert=true){
   const phone = String($('payerPhone')?.value || '').trim();
   const pack = packageInfo[lastSelectedPackageKey] || {};
   const name = lastReport?.data?.name || '';
-  const text = `Төлөх банкны апп: ${bank.bank}
+  const text = `Хүлээн авагч: ${PAYMENT_CONFIG.receiverName}
 Хүлээн авах банк: ${PAYMENT_CONFIG.receiverBank}
-Хүлээн авагч: ${PAYMENT_CONFIG.receiverName}
 Дансны дугаар: ${PAYMENT_CONFIG.accountNumber}
-Банкны код: ${PAYMENT_CONFIG.bankCode || ''}
+Код: ${PAYMENT_CONFIG.bankCode || ''}
+Төлөх дүн: ${pack.price || ''}
 Гүйлгээний утга: ${name} - ${phone || 'утас'} - ${pack.months || ''} сар`;
-  try { await navigator.clipboard.writeText(text); alert('Дансны мэдээлэл хууллаа. Одоо сонгосон банкны апп руу орж шилжүүлгээ хийнэ.'); }
-  catch(e){ alert(text); }
+  try {
+    await navigator.clipboard.writeText(text);
+    if(showAlert) alert('Дансны мэдээлэл хууллаа. Одоо өөрийн банкны апп дээр шилжүүлгээ хийнэ.');
+  } catch(e){ if(showAlert) alert(text); }
 };
 
 window.submitPaymentRequest = async function(){
@@ -407,56 +424,40 @@ window.submitPaymentRequest = async function(){
   const req = buildRequestObject(phone, bank);
   const requestText = buildPaymentRequest(phone, bank);
   if ($('copyArea')) $('copyArea').value = requestText;
-  try { await sendRequestToAdmin(req); } catch(e) { alert('Хүсэлт Firebase рүү илгээгдсэнгүй: ' + (e && e.message ? e.message : e) + '\n\nFirestore Rules хэсгийг түр нээлттэй болгосон эсэхээ шалга.'); return; }
+  try { await sendRequestToAdmin(req); } catch(e) { alert('Хүсэлт админ хэсэгт очсонгүй: ' + (e && e.message ? e.message : e) + '\n\nFirebase → Firestore → Rules дээр allow create: if true; тавьсан эсэхээ шалга.'); return; }
   try { await navigator.clipboard.writeText(requestText); } catch(e) {}
   const sent = $('requestSent');
-  if (sent) sent.classList.remove('hidden');
-  alert('Хүсэлт системийн админ хэсэг рүү илгээгдлээ. Админ мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоос таны дугаарт очно.');
+  if (sent) {
+    sent.classList.remove('hidden');
+    sent.innerHTML = `Хүсэлт админ хэсэгт очлоо. Хүсэлтийн дугаар: <b>${escapeHtml(req.id)}</b>. Админ мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоос таны утасны дугаарт очно.`;
+  }
+  alert('Хүсэлт админ хэсэгт амжилттай очлоо. Хүсэлтийн дугаар: ' + req.id);
 };
 
 window.selectPackage = function(key){
   if (!lastReport) return;
   lastSelectedPackageKey = key;
-  const { data, bmi, risk, route, targetLoss } = lastReport;
+  const { data, bmi, risk } = lastReport;
   const pack = packageInfo[key];
-  const defaultPhone = '';
-  const summary = `Эрүүл Бие — Эрүүл Жин төлбөрийн хүсэлт\n\nНэр: ${data.name}\nУтас: ${defaultPhone}\nСонгосон багц: ${pack.title}\nТөлөх дүн: ${pack.price}\nБиеийн жингийн индекс: ${round(bmi,1)} — ${risk.level}`;
+  const summary = `Эрүүл Бие — Эрүүл Жин төлбөрийн хүсэлт\n\nНэр: ${data.name}\nУтас: \nСонгосон багц: ${pack.title}\nТөлөх дүн: ${pack.price}\nБиеийн жингийн индекс: ${round(bmi,1)} — ${risk.level}`;
   $('copyArea').value = summary;
   const pay = $('paymentBox');
   pay.classList.remove('hidden');
   pay.innerHTML = `
-    <h3>Төлбөрийн хүсэлт админ руу илгээх</h3>
-    <p><b>${escapeHtml(data.name)}</b>, таны сонгосон багц: <b>${escapeHtml(pack.title)}</b>. Доорх дансаар төлбөрөө хийгээд утасны дугаараа бичиж хүсэлтээ админ руу илгээнэ. Админ мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоос таны оруулсан дугаарт очно.</p>
-    <div class="invoiceGrid">
-      <div class="invoiceLine"><span>Төлөх дүн</span><b>${escapeHtml(pack.price)}</b></div>
-      <div class="invoiceLine"><span>Гүйлгээний утга</span><b>${escapeHtml(data.name)} - утасны дугаар - ${pack.months} сар</b></div>
-    </div>
-
-    <div class="paymentForm">
-      <label>Тайлангийн холбоос авах утасны дугаар
-        <input id="payerPhone" type="tel" inputmode="tel" placeholder="Жишээ: 99112233" required />
+    <div class="payDark">
+      <h3>Төлбөр төлөх</h3>
+      <p><b>${escapeHtml(data.name)}</b>, таны сонгосон багц: <b>${escapeHtml(pack.title)}</b> · <b>${escapeHtml(pack.price)}</b></p>
+      <div class="payPill">Данс: <b>${escapeHtml(PAYMENT_CONFIG.accountNumber)}</b> · Код: <b>${escapeHtml(PAYMENT_CONFIG.bankCode)}</b></div>
+      <button class="copyAccountBtn" type="button" onclick="copyBankInfo()">Данс хуулах — ${escapeHtml(PAYMENT_CONFIG.accountNumber)}</button>
+      <label class="phoneDark">Тайлангийн холбоос авах утасны дугаар
+        <input id="payerPhone" type="tel" inputmode="tel" placeholder="Жишээ: 99112233" required oninput="updateBankDetails()" />
       </label>
-
-      <div class="bankSelectTitle">Төлбөр хийх банкны апп</div>
-      <div class="bankGrid">${bankOptionsHtml()}</div>
-
-      <div id="bankDetails" class="invoiceGrid bankDetails">${bankDetailsHtml(PAYMENT_CONFIG.bankApps[0])}</div>
-
-      <div class="askActions">
-        <button class="btn secondary" type="button" onclick="copyBankInfo()">Дансны мэдээлэл хуулах</button>
-        <button class="btn secondary" type="button" onclick="openBankApp()">Сонгосон банкны апп нээх</button>
-        <button class="btn primary" type="button" onclick="submitPaymentRequest()">Төлбөр хийсэн — админд илгээх</button>
-      </div>
-
-      <div id="requestSent" class="pdfReady hidden">
-        Таны хүсэлт системийн админ хэсэг рүү илгээгдлээ. Админ мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоос таны утасны дугаарт очно.
-        <div class="askActions">
-          <button class="btn light" type="button" onclick="copyOrder()">Хүсэлт дахин хуулах</button>
-        </div>
-      </div>
+      <div id="bankDetails">${bankDetailsHtml()}</div>
+      <div class="bankTileGrid" id="bankTiles">${bankTilesHtml()}</div>
+      <button class="btn primary wide" type="button" onclick="submitPaymentRequest()">Төлбөр хийсэн — админд хүсэлт илгээх</button>
+      <div id="requestSent" class="pdfReady hidden"></div>
+      <p class="payNote">Банкны зураг дээр дарахад тухайн банкны апп нээгдэнэ. Апп нээгдсэний дараа хуулсан дансны мэдээллээр шилжүүлгээ хийгээд дээрх товчоор хүсэлтээ админд илгээнэ.</p>
     </div>
-
-    <p class="smallNote">Энэ хэсгээс шууд PDF татахгүй. Эхлээд системээр хүсэлт админ руу илгээгдэнэ. Админ баталгаажуулсны дараа тайлангийн холбоос таны утасны дугаарт очно.</p>
   `;
   pay.scrollIntoView({behavior:'smooth', block:'start'});
 };
