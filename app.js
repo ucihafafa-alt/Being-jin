@@ -1,5 +1,5 @@
 
-// v20: detailed report + improved bank UI
+// v21 checked: detailed report + improved bank UI
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister())).catch(()=>{});
   if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});

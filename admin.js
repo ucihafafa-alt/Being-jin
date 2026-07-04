@@ -1,5 +1,4 @@
-
-// v20: detailed report + sms/admin link fix
+// v21 checked: detailed report + sms/admin link fix
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister())).catch(()=>{});
   if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
@@ -10,7 +9,7 @@ const ADMIN_CONFIG = {
 };
 const $ = (id) => document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
-function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=20`;}
+function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=21`;}
 function setStatus(t){$('adminStatus').textContent=t;}
 function localRequests(){return JSON.parse(localStorage.getItem('ebej_admin_requests') || '[]');}
 function isFirebaseReady(){return window.EBEJ_FIREBASE_READY && window.EBEJ_DB && window.EBEJ_AUTH;}
@@ -119,7 +118,6 @@ window.copySms = async function(link,name,phone){
   await navigator.clipboard.writeText(msg).catch(()=>{});
   alert('Дугаарт явуулах текст хууллаа. Утас: '+(phone||''));
 };
-
 window.openSms = function(phoneEnc, linkEnc, nameEnc, mode='sms'){
   const phone = decodeURIComponent(phoneEnc || '').replace(/[^0-9+]/g,'');
   const link = decodeURIComponent(linkEnc || '');
@@ -132,12 +130,9 @@ window.openSms = function(phoneEnc, linkEnc, nameEnc, mode='sms'){
   }
   navigator.clipboard.writeText(msg).catch(()=>{});
   const body = encodeURIComponent(msg);
-  // Android дээр browser бүр өөрөөр ажилладаг тул 2 scheme дэмжив.
   const smsUrl = mode === 'smsto' ? `smsto:${phone}?body=${body}` : `sms:${phone}?body=${body}`;
-  // Android дээр зарим SMS app ?body, зарим нь &body эсвэл ;?body ашигладаг. Эхний оролдлого ажиллахгүй бол "SMS нөөц хувилбар" дарна.
   window.location.href = smsUrl;
 };
-
 
 window.signInAdmin = signInAdmin;
 window.signOutAdmin = signOutAdmin;
