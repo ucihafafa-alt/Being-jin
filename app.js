@@ -1,5 +1,5 @@
 
-// v19: old PWA cache killer
+// v20: detailed report + improved bank UI
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister())).catch(()=>{});
   if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
@@ -20,16 +20,17 @@ const PAYMENT_CONFIG = {
   iban: '59000500',
   // Банкны товч дээр дарахад Android дээр шууд тухайн аппыг нээхээр оролдоно. Play Store fallback зориуд хийсэнгүй.
   bankApps: [
-    { key:'khan', bank:'Хаан банк', short:'ХААН', logo:'☯', packageId:'com.khanbank.retail' },
-    { key:'golomt', bank:'Голомт', short:'G', logo:'G', packageId:'mn.egolomt.new.bank' },
-    { key:'tdb', bank:'TDB', short:'TDB', logo:'TDB', packageId:'mn.tdb.pay' },
-    { key:'xac', bank:'Хас банк', short:'XAC', logo:'XAC', packageId:'com.xacbank.mobile' },
-    { key:'state', bank:'Төрийн банк', short:'ТӨР', logo:'ТӨР', packageId:'com.statebank.gyalsbank' },
-    { key:'mbank', bank:'M bank', short:'M', logo:'M', packageId:'mn.mllc.mbank' },
-    { key:'bogd', bank:'Богд банк', short:'БОГД', logo:'БОГД', packageId:'com.bogdbank.ebank.v2' },
-    { key:'arig', bank:'Ариг банк', short:'АРИГ', logo:'АРИГ', packageId:'mn.arig.online' },
-    { key:'sono', bank:'Sono', short:'SONO', logo:'SONO', packageId:'mn.sono.app' },
-    { key:'payon', bank:'PayOn', short:'PayOn', logo:'PayOn', packageId:'mn.tbf.payon' }
+    // bankUrl нь Play Store биш, зөвхөн тухайн аппын custom scheme-ийг дуудаж үзнэ. App албан deep link-гүй бол шилжүүлгийн дэлгэц шууд нээгдэхгүй.
+    { key:'khan', bank:'Хаан банк', short:'ХААН', logo:'ХААН', bankUrl:'khanbank://', packageId:'com.khanbank.retail' },
+    { key:'golomt', bank:'Голомт', short:'G', logo:'G', bankUrl:'egolomt://', packageId:'mn.egolomt.new.bank' },
+    { key:'tdb', bank:'TDB', short:'TDB', logo:'TDB', bankUrl:'tdbbank://', packageId:'mn.tdb.pay' },
+    { key:'xac', bank:'Хас банк', short:'XAC', logo:'XAC', bankUrl:'xacbank://', packageId:'com.xacbank.mobile' },
+    { key:'state', bank:'Төрийн банк', short:'ТӨР', logo:'ТӨР', bankUrl:'statebank://', packageId:'com.statebank.gyalsbank' },
+    { key:'mbank', bank:'M bank', short:'M', logo:'M', bankUrl:'mbank://', packageId:'mn.mllc.mbank' },
+    { key:'bogd', bank:'Богд банк', short:'БОГД', logo:'БОГД', bankUrl:'bogdbank://', packageId:'com.bogdbank.ebank.v2' },
+    { key:'arig', bank:'Ариг банк', short:'АРИГ', logo:'АРИГ', bankUrl:'arigbank://', packageId:'mn.arig.online' },
+    { key:'sono', bank:'Sono', short:'SONO', logo:'SONO', bankUrl:'sono://', packageId:'mn.sono.app' },
+    { key:'payon', bank:'PayOn', short:'PayOn', logo:'PayOn', bankUrl:'payon://', packageId:'mn.tbf.payon' }
   ]
 };
 
@@ -42,7 +43,7 @@ const packageInfo = {
 
 const routeInfo = {
   active: { title: 'Хөдөлгөөнтэй хэлбэр', monthlyMin: 2, monthlyMax: 4, note: 'алхалт, гэрийн хөнгөн дасгал, хооллолтын зохицуулалттай хэрэгжинэ' },
-  low: { title: 'Хөдөлгөөн багатай хэлбэр', monthlyMin: 1.5, monthlyMax: 3.2, note: 'суугаа ажилтай, зав багатай хүнд хоолны цаг, хэмжээ, ус, нойр дээр төвлөрнө' },
+  low: { title: 'Хөдөлгөөн хийх боломжгүй хэлбэр', monthlyMin: 1.5, monthlyMax: 3.2, note: 'дасгал хийх боломжгүй, суугаа хэв маягтай хүнд хоолны цаг, хэмжээ, ус, нойр, бичил дадал дээр төвлөрнө' },
   support: { title: 'Дэмжих бүтээгдэхүүнтэй хэлбэр', monthlyMin: 2, monthlyMax: 4, note: 'дэмжих бүтээгдэхүүн дангаараа биш, хооллолт, ус, нойр, дадалтай хамт хэрэгжинэ' }
 };
 
@@ -299,15 +300,14 @@ window.showPackages = function(){
 };
 
 
-function makeIntentLink(app){
-  const pkg = app.packageId || '';
-  // Android: browser шууд app нээж чадахгүй бол Play Store руу үсэрч магадгүй. Энэ нь банкны app-н албан deep link байхгүйгээс болно.
-  return `intent://#Intent;package=${pkg};action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end`;
+function makeBankLink(app){
+  // Play Store руу үсрүүлэхгүй. Зөвхөн банкны custom scheme рүү оролдож нээнэ.
+  return app.bankUrl || '';
 }
 
 function bankTilesHtml(){
   return PAYMENT_CONFIG.bankApps.map((app, idx) => `
-    <button class="payBankTile ${idx === lastPaymentBankIndex ? 'active' : ''}" type="button" onclick="openBankAppByIndex(${idx})" aria-label="${escapeHtml(app.bank)} апп нээх">
+    <button class="payBankTile ${idx === lastPaymentBankIndex ? 'active' : ''}" type="button" onclick="openBankAppByIndex(${idx})" aria-label="${escapeHtml(app.bank)} апп руу орох">
       <span class="bankLogoText ${escapeHtml(app.key)}"><em>${escapeHtml(app.logo || app.short)}</em></span>
       <b>${escapeHtml(app.bank)}</b>
     </button>
@@ -344,11 +344,13 @@ window.openBankAppByIndex = async function(idx){
   if (grid) grid.innerHTML = bankTilesHtml();
   await copyBankInfo(false);
   const app = selectedPaymentBank();
-  const link = makeIntentLink(app);
-  const opened = window.open(link, '_self');
+  const link = makeBankLink(app);
+  const note = $('bankOpenNote');
+  if (note) note.innerHTML = `<b>${escapeHtml(app.bank)}</b> апп нээж байна. Данс, IBAN, дүн, гүйлгээний утга хуулсан байгаа.`;
+  if (link) { window.location.href = link; }
   setTimeout(() => {
-    const note = $('bankOpenNote');
-    if (note) note.innerHTML = `<b>${escapeHtml(app.bank)}</b> апп нээгдэхгүй бол таны browser банкны app-н шууд нээх эрхийг хааж байна. Тэгвэл апп руугаа гараар ороод хуулсан дансаар шилжүүлгээ хийнэ.`;
+    const note2 = $('bankOpenNote');
+    if (note2) note2.innerHTML = `<b>${escapeHtml(app.bank)}</b> апп өөрөө нээгдэхгүй бол банкны апп руугаа гараар ороод хуулсан данс/IBAN-р шилжүүлгээ хийнэ. Шууд данс, дүн бөглөгддөг болгоход QPay/банкны албан deeplink хэрэгтэй.`;
   }, 900);
 };
 
@@ -389,7 +391,7 @@ function buildPaymentRequest(phone, bank){
   const req = buildRequestObject(phone, bank);
   if (!req) return '';
   const d = req.data;
-  return `Эрүүл Бие — Эрүүл Жин төлбөрийн хүсэлт\n\nХүсэлтийн дугаар: ${req.id}\nНэр: ${d.name}\nУтас: ${phone}\nСонгосон багц: ${req.packageTitle}\nТөлөх дүн: ${req.packagePrice}\nАпп нээсэн банк: ${bank.bank}
+  return `Эрүүл Бие — Эрүүл Жин төлбөрийн хүсэлт\n\nХүсэлтийн дугаар: ${req.id}\nНэр: ${d.name}\nУтас: ${phone}\nСонгосон багц: ${req.packageTitle}\nТөлөх дүн: ${req.packagePrice}\nСонгосон банк: ${bank.bank}
 Хүлээн авах банк: ${PAYMENT_CONFIG.receiverBank}
 Хүлээн авагч: ${PAYMENT_CONFIG.receiverName}
 Дансны дугаар: ${PAYMENT_CONFIG.accountNumber}

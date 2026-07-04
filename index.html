@@ -13,7 +13,7 @@
     if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())).catch(()=>{});
     if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
   </script>
-  <link rel="stylesheet" href="style.css?v=19?v=17" />
+  <link rel="stylesheet" href="style.css?v=20?v=17" />
 </head>
 <body>
   <header class="hero">
@@ -112,7 +112,7 @@
           <h3>4. Танд аль хэлбэр илүү боломжтой вэ?</h3>
           <div class="choiceGrid">
             <label class="choice"><input type="radio" name="route" value="active" required /> <span>Хөдөлгөөнтэй</span><small>Алхалт, гэрийн хөнгөн дасгал хийх боломжтой</small></label>
-            <label class="choice"><input type="radio" name="route" value="low" /> <span>Хөдөлгөөн багатай</span><small>Суугаа ажилтай, цаг зав багатай</small></label>
+            <label class="choice"><input type="radio" name="route" value="low" /> <span>Хөдөлгөөн хийх боломжгүй</span><small>Дасгал хийх завгүй, суугаа ажилтай, зөв дадлаар жин бууруулах</small></label>
             <label class="choice"><input type="radio" name="route" value="support" /> <span>Дэмжих бүтээгдэхүүнтэй</span><small>Хооллолт, ус, нойр, дадалтай хамт хэрэгжүүлэх</small></label>
           </div>
         </div>
@@ -127,7 +127,7 @@
   <footer><p>© Эрүүл Бие — Эрүүл Жин</p></footer>
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
-  <script src="firebase-config.js?v=19?v=17"></script>
-  <script src="app.js?v=19?v=17"></script>
+  <script src="firebase-config.js?v=20?v=17"></script>
+  <script src="app.js?v=20?v=17"></script>
 </body>
 </html>
