@@ -62,6 +62,25 @@ function kg(num){ return `${round(Math.max(0,num),1)} кг`; }
 function escapeHtml(str){ return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
 function showVal(v){ return displayMap[v] || v || 'тодорхойгүй'; }
 
+function isNoneLikeText(str){
+  const raw = String(str || '').trim().toLowerCase();
+  if (!raw) return true;
+  const compact = raw.replace(/[\s.,!?;:()\-—_]+/g, '');
+  const noneWords = ['байхгүй','байхгуй','үгүй','угүй','үгvй','ugui','gvi','gui','baihgui','bhgui','bhgvi','no','none','0','-','эрүүл','eruul','өвчингүй','uvchingui','зовиургүй','zoviurgui'];
+  if (noneWords.includes(compact)) return true;
+  if (compact.includes('байхгүй') || compact.includes('байхгуй') || compact.includes('baihgui') || compact.includes('bhgui') || compact.includes('bhgvi') || compact.includes('өвчинбайхгүй') || compact.includes('uvchinbaihgui')) return true;
+  return false;
+}
+
+function normalizeOpenText(str, fallback='байхгүй'){
+  const raw = String(str || '').trim();
+  return isNoneLikeText(raw) ? fallback : raw;
+}
+
+function hasMedicalConcern(str){
+  return !isNoneLikeText(str);
+}
+
 function bmiCategory(bmi){
   if (bmi < 18.5) return 'under';
   if (bmi < 25) return 'normal';
@@ -104,7 +123,7 @@ function possibleSymptoms(data, cat){
 
 function strengths(data){
   const arr = [];
-  if (data.waterLiters >= 1.5) arr.push('усны хэрэглээгээ сайжруулах суурь байна');
+  if (data.waterLiters >= 1.5) arr.push('ус уух дадлаа тогтворжуулах боломж байна');
   if (data.sleepHours >= 7) arr.push('нойрны цаг боломжийн байна');
   if (data.cook !== 'outside') arr.push('гэрийн энгийн хоолоор төлөвлөгөө хэрэгжүүлэх боломж байна');
   if (data.sweet !== 'high') arr.push('чихэрлэг хэрэглээг хянах боломж байна');
@@ -118,7 +137,7 @@ function getData(){
     workType: val('workType'), sittingHours: n(val('sittingHours')), sleepHours: n(val('sleepHours')),
     waterLiters: n(val('waterLiters')), meals: n(val('meals')), lastMeal: val('lastMeal'),
     sweet: val('sweet'), carb: val('carb'), drink: val('drink'), cook: val('cook'),
-    avoidFood: val('avoidFood') || 'тодорхойгүй', medical: val('medical') || 'тодорхой бичээгүй', route: selected('route')
+    avoidFood: normalizeOpenText(val('avoidFood'), 'байхгүй'), medical: normalizeOpenText(val('medical'), 'байхгүй'), route: selected('route')
   };
 }
 
@@ -140,7 +159,7 @@ function renderResult(data){
   const waistText = waistRisk(data.gender, data.waist);
   const habits = habitRisks(data);
   const symptoms = possibleSymptoms(data, r.cat);
-  const medicalNote = data.medical !== 'тодорхой бичээгүй' ? `<p class="dangerText">Та эрүүл мэндийн анхаарах зүйл бичсэн байна: ${escapeHtml(data.medical)}. Ийм үед төлөвлөгөөг эмчийн зөвлөгөөтэй хамт хэрэгжүүлэх нь зөв.</p>` : '';
+  const medicalNote = hasMedicalConcern(data.medical) ? `<p class="dangerText">Эрүүл мэндийн анхаарах зүйл: ${escapeHtml(data.medical)}. Төлөвлөгөө сонгохдоо энэ мэдээллийг заавал харгалзана.</p>` : ``;
 
   result.classList.remove('hidden');
   result.innerHTML = `
@@ -150,7 +169,7 @@ function renderResult(data){
         <h2>${escapeHtml(data.name)} таны Биеийн жингийн индекс</h2>
         <div class="bmiNumber">${round(r.bmi,1)}</div>
         <p class="${r.risk.tone}">${r.risk.level}</p>
-        <p>Энэ нь эмчийн онош биш. Таны оруулсан өндөр, жин, бэлхүүс, амьдралын хэв маягт тулгуурласан урьдчилсан тайлбар юм.</p>
+        <p>Таны оруулсан өндөр, жин, бэлхүүс, амьдралын хэв маягт тулгуурласан урьдчилсан тайлбар.</p>
       </div>
       <div class="metricGrid">
         <div class="metric"><span>Одоогийн жин</span><b>${kg(data.weight)}</b></div>
@@ -177,9 +196,9 @@ function renderResult(data){
     </div>
 
     <div class="panel" style="margin-top:16px">
-      <h3>Одоо танд дараах зовиур илэрч байна уу?</h3>
+      <h3>Илүүдэл жин, суугаа хэв маягтай үед илэрч болзошгүй зовиурууд</h3>
       <ul>${symptoms.map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul>
-      <p>Эдгээр нь заавал өвчин гэсэн үг биш. Харин бие тань ачааллаа мэдрүүлж эхэлж байж болох дохио юм.</p>
+      <p>Эдгээрээс илэрч байвал биеийн ачааллаа багасгаж, төлөвлөгөөг тайван эхлүүлэх нь зөв.</p>
     </div>
 
     <div class="askBox">
@@ -241,9 +260,9 @@ window.showPackages = function(){
         </article>
       `).join('')}
     </div>
-    <textarea class="copyArea" id="copyArea" readonly placeholder="Багц сонгоход хураангуй энд гарна"></textarea>
-    <div class="askActions"><button class="btn secondary" type="button" onclick="copyOrder()">Хураангуй хуулах</button><button class="btn ghost" type="button" onclick="window.print()">PDF / Хэвлэх</button></div>
-    <p class="fineprint">Систем таны мэдээллийг серверт хадгалахгүй. Бүрэн төлөвлөгөө авах бол хураангуйгаа хуулж page рүү илгээнэ.</p>
+    <div id="paymentBox" class="paymentBox hidden"></div>
+    <textarea class="copyArea hidden" id="copyArea" readonly placeholder="Багц сонгоход хураангуй энд гарна"></textarea>
+    <p class="fineprint">Сонгосон багцаа төлөөд энэ хэсгээс PDF тайлангаа хэвлэж эсвэл хадгалж авна.</p>
   `;
   area.scrollIntoView({behavior:'smooth', block:'start'});
 };
@@ -252,16 +271,38 @@ window.selectPackage = function(key){
   if (!lastReport) return;
   const { data, bmi, risk, route, targetLoss } = lastReport;
   const pack = packageInfo[key];
-  const text = `Эрүүл Бие — Эрүүл Жин багц авах хүсэлт\n\nНэр: ${data.name}\nНас: ${data.age}\nХүйс: ${showVal(data.gender)}\nӨндөр: ${data.height} см\nОдоогийн жин: ${data.weight} кг\nЗорилтот жин: ${data.targetWeight} кг\nХасахыг хүсэж буй жин: ${round(targetLoss,1)} кг\nБэлхүүс: ${data.waist || 'бичээгүй'} см\nБиеийн жингийн индекс: ${round(bmi,1)} — ${risk.level}\n\nСонгосон хэлбэр: ${route.title}\nСонгосон багц: ${pack.title} — ${pack.price}\n\nСуугаа цаг: ${data.sittingHours}\nНойр: ${data.sleepHours} цаг\nУс: ${data.waterLiters} литр\nХооллох тоо: ${data.meals}\nОройн хоол: ${showVal(data.lastMeal)}\nАмттан: ${showVal(data.sweet)}\nГурил/будаа: ${showVal(data.carb)}\nУндаа/шүүс: ${showVal(data.drink)}\nХоол хийх боломж: ${showVal(data.cook)}\nИддэггүй/харшилтай хүнс: ${data.avoidFood}\nЭрүүл мэндийн анхаарах зүйл: ${data.medical}\n\nМиний өгсөн хариултад тулгуурласан ${pack.months} сарын дэлгэрэнгүй төлөвлөгөө гаргуулъя.`;
+  const text = `Эрүүл Бие — Эрүүл Жин тайлан\n\nНэр: ${data.name}\nНас: ${data.age}\nХүйс: ${showVal(data.gender)}\nӨндөр: ${data.height} см\nОдоогийн жин: ${data.weight} кг\nЗорилтот жин: ${data.targetWeight} кг\nХасахыг хүсэж буй жин: ${round(targetLoss,1)} кг\nБэлхүүс: ${data.waist || 'бичээгүй'} см\nБиеийн жингийн индекс: ${round(bmi,1)} — ${risk.level}\n\nСонгосон хэлбэр: ${route.title}\nСонгосон багц: ${pack.title} — ${pack.price}\n\nСуугаа цаг: ${data.sittingHours}\nНойр: ${data.sleepHours} цаг\nУс: ${data.waterLiters} литр\nХооллох тоо: ${data.meals}\nОройн хоол: ${showVal(data.lastMeal)}\nАмттан: ${showVal(data.sweet)}\nГурил/будаа: ${showVal(data.carb)}\nУндаа/шүүс: ${showVal(data.drink)}\nХоол хийх боломж: ${showVal(data.cook)}\nИддэггүй/харшилтай хүнс: ${data.avoidFood}\nЭрүүл мэндийн анхаарах зүйл: ${data.medical}\n\n${pack.months} сарын багцын төлөвлөгөө PDF хэлбэрээр авна.`;
   $('copyArea').value = text;
-  $('copyArea').focus();
+  const pay = $('paymentBox');
+  pay.classList.remove('hidden');
+  pay.innerHTML = `
+    <h3>Төлбөр төлөөд PDF тайлан авах</h3>
+    <p><b>${escapeHtml(data.name)}</b>, таны сонгосон багц: <b>${escapeHtml(pack.title)}</b></p>
+    <div class="invoiceGrid">
+      <div class="invoiceLine"><span>Төлөх дүн</span><b>${escapeHtml(pack.price)}</b></div>
+      <div class="invoiceLine"><span>Гүйлгээний утга</span><b>${escapeHtml(data.name)} - ${escapeHtml(pack.title)}</b></div>
+      <div class="invoiceLine"><span>Дансны мэдээлэл</span><b>Энд өөрийн дансны нэр, дугаараа бичнэ</b></div>
+    </div>
+    <p class="smallNote">Дансны мэдээллийг өөрийн банкны дансаар солино. Төлбөрийн дараа доорх товчоор тайлангаа PDF болгон хадгална.</p>
+    <div class="askActions">
+      <button class="btn primary" type="button" onclick="markPaid()">Төлбөр төлсөн — PDF тайлан авах</button>
+      <button class="btn secondary" type="button" onclick="copyOrder()">Хураангуй хуулах</button>
+    </div>
+    <div id="pdfReady" class="pdfReady hidden">PDF авахад бэлэн. Гар утасны хэвлэх цонхноос “Save as PDF” сонгоорой.<div class="askActions"><button class="btn primary" type="button" onclick="window.print()">PDF / Хэвлэх</button></div></div>
+  `;
+  pay.scrollIntoView({behavior:'smooth', block:'start'});
+};
+
+window.markPaid = function(){
+  const box = $('pdfReady');
+  if (box) box.classList.remove('hidden');
 };
 
 window.copyOrder = async function(){
   const text = $('copyArea')?.value || '';
   if (!text) { alert('Эхлээд багцаа сонгоно уу.'); return; }
-  try { await navigator.clipboard.writeText(text); alert('Хураангуй хууллаа. Одоо page рүү илгээж болно.'); }
-  catch(e){ alert('Хуулж чадсангүй. Доорх текстийг гараар copy хийнэ үү.'); }
+  try { await navigator.clipboard.writeText(text); alert('Хураангуй хууллаа.'); }
+  catch(e){ alert('Хуулж чадсангүй. Текстийг гараар copy хийнэ үү.'); }
 };
 
 $('healthForm').addEventListener('submit', (e) => {
