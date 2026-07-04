@@ -3,7 +3,7 @@ const ADMIN_CONFIG = {
 };
 const $ = (id) => document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
-function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=11v=12`;}
+function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=13`;}
 function setStatus(t){$('adminStatus').textContent=t;}
 function localRequests(){return JSON.parse(localStorage.getItem('ebej_admin_requests') || '[]');}
 function isFirebaseReady(){return window.EBEJ_FIREBASE_READY && window.EBEJ_DB && window.EBEJ_AUTH;}
@@ -11,7 +11,15 @@ function isFirebaseReady(){return window.EBEJ_FIREBASE_READY && window.EBEJ_DB &
 async function signInAdmin(){
   if(!isFirebaseReady()){ alert('Firebase тохиргоо хийгдээгүй байна. firebase-config.js-ээ бөглөнө үү.'); return; }
   const provider = new firebase.auth.GoogleAuthProvider();
-  await window.EBEJ_AUTH.signInWithPopup(provider);
+  provider.setCustomParameters({ prompt: 'select_account' });
+  try{
+    await window.EBEJ_AUTH.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    // Гар утасны browser дээр popup хаагдах/буцах асуудал гардаг тул redirect ашиглав.
+    await window.EBEJ_AUTH.signInWithRedirect(provider);
+  }catch(e){
+    console.error(e);
+    alert('Google нэвтрэлт эхлүүлэхэд алдаа гарлаа. Firebase Authentication дээр Google provider асаасан эсэх, Authorized domains дээр ucihafafa-alt.github.io байгаа эсэхийг шалга.');
+  }
 }
 async function signOutAdmin(){ if(window.EBEJ_AUTH) await window.EBEJ_AUTH.signOut(); }
 
@@ -99,8 +107,14 @@ window.copySms = async function(link,name,phone){
 window.signInAdmin = signInAdmin;
 window.signOutAdmin = signOutAdmin;
 
-window.addEventListener('load',()=>{
+window.addEventListener('load',async ()=>{
   if(isFirebaseReady()){
+    try{
+      await window.EBEJ_AUTH.getRedirectResult();
+    }catch(e){
+      console.error('Redirect login error', e);
+      setStatus('Google нэвтрэхэд алдаа гарлаа. Firebase Authentication → Google асаасан эсэх, Settings → Authorized domains дээр ucihafafa-alt.github.io нэмсэн эсэхээ шалга.');
+    }
     window.EBEJ_AUTH.onAuthStateChanged(user=>{
       $('loginState').innerHTML = user ? `Нэвтэрсэн: <b>${esc(user.email)}</b> <button class="btn light smallBtn" onclick="signOutAdmin()">Гарах</button>` : '<button class="btn primary" onclick="signInAdmin()">Google админаар нэвтрэх</button>';
       loadRequests();
