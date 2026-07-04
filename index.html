@@ -6,8 +6,16 @@
   <meta name="theme-color" content="#0f766e" />
   <meta name="description" content="Эрүүл Бие — Эрүүл Жин: Биеийн жингийн индекс, бэлхүүс, амьдралын хэв маягт тулгуурласан урьдчилсан үнэлгээ." />
   <title>Эрүүл Бие — Эрүүл Жин</title>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())).catch(()=>{});
+    }
+    if (window.caches) {
+      caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
+    }
+  </script>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
   <header class="hero">
@@ -136,6 +144,6 @@
     <p>© Эрүүл Бие — Эрүүл Жин. Энэхүү үнэлгээ нь эмчийн оношилгоо, эмчилгээний зааврыг орлохгүй.</p>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
