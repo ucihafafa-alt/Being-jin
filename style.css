@@ -74,7 +74,7 @@ footer{text-align:center;color:#6a7c76;padding:28px 18px 44px;font-size:13px}
 .bankSelectTitle{font-weight:950;margin:14px 0 10px;color:#15342e;font-size:15px}
 .bankGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 12px}
 .bankChoice{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:15px;padding:11px 10px;background:#fbfffd;font-weight:900;cursor:pointer}
-.bankChoice input{width:auto;margin:0}.bankChoice span{font-size:13px}.bankDetails{margin-top:12px}.bankLink{display:inline-flex;margin-top:6px;font-weight:900;color:#0f766e}.mutedLink{color:#72837e!important}.paymentForm{display:grid;gap:12px;margin-top:12px}.paymentForm label{display:block}
+.bankChoice input{width:auto;margin:0}.bankChoice span{font-size:13px}.bankDetails{margin-top:12px}.bankLink{display:inline-flex;margin-top:6px;font-weight:900;color:#0f766e}.bankLink.asButton{border:0;background:transparent;padding:0;text-align:left;cursor:pointer;font:inherit;color:#0f766e}.mutedLink{color:#72837e!important}.paymentForm{display:grid;gap:12px;margin-top:12px}.paymentForm label{display:block}
 @media (max-width:390px){.bankGrid{grid-template-columns:1fr}.paymentBox h3{font-size:19px}.invoiceLine b{font-size:15px}}
 
 /* v10 admin/report additions */

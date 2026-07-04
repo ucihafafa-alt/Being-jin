@@ -1,22 +1,11 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isAdmin() {
-      return request.auth != null && request.auth.uid in [
-        'ADMIN_UID_ЭНД_БИЧНЭ'
-      ];
-    }
-
     match /requests/{requestId} {
-      // Хэрэглэгч хүсэлт үүсгэж болно.
+      // Түр тохиргоо: хүсэлт тестлэхийн тулд нээлттэй.
+      // Систем бүрэн ажилламагц админ UID-тэй хамгаалалттай rules болгож солино.
       allow create: if true;
-
-      // Админ бүх хүсэлтийг харна. Хэрэглэгч зөвхөн баталгаажсан тайлангийн link-ээр уншина.
-      allow get: if isAdmin() || resource.data.status == 'approved';
-      allow list: if isAdmin();
-
-      // Зөвхөн админ батлах/засах боломжтой.
-      allow update, delete: if isAdmin();
+      allow read, update, delete: if true;
     }
   }
 }

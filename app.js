@@ -6,11 +6,18 @@ let lastSelectedPackageKey = null;
 const PAYMENT_CONFIG = {
   backend: 'firebase',
   reportBaseUrl: 'https://ucihafafa-alt.github.io/Being-jin/report.html',
-  accounts: [
-    { bank: 'ХААН банк', holder: 'ДАНСНЫ НЭР ЭНД БИЧНЭ', number: 'ДАНСНЫ ДУГААР ЭНД БИЧНЭ', link: '' },
-    { bank: 'Голомт банк', holder: 'ДАНСНЫ НЭР ЭНД БИЧНЭ', number: 'ДАНСНЫ ДУГААР ЭНД БИЧНЭ', link: '' },
-    { bank: 'Худалдаа хөгжлийн банк', holder: 'ДАНСНЫ НЭР ЭНД БИЧНЭ', number: 'ДАНСНЫ ДУГААР ЭНД БИЧНЭ', link: '' },
-    { bank: 'Төрийн банк', holder: 'ДАНСНЫ НЭР ЭНД БИЧНЭ', number: 'ДАНСНЫ ДУГААР ЭНД БИЧНЭ', link: '' }
+  receiverName: 'Л.Батцог',
+  receiverBank: 'ХААН Банк',
+  accountNumber: '5680034540',
+  bankCode: '59000500',
+  // Доорх товчууд нь хэрэглэгчийн сонгосон банкны аппыг Android дээр нээх оролдлого хийнэ.
+  // Данс/дүн/утгыг автоматаар бөглөх бол тухайн банкны merchant deep link эсвэл QPay шаардлагатай.
+  bankApps: [
+    { bank: 'ХААН Банк', packageId: 'com.khanbank.retail', playUrl: 'https://play.google.com/store/apps/details?id=com.khanbank.retail' },
+    { bank: 'Төрийн банк', packageId: 'com.statebank.gyalsbank', playUrl: 'https://play.google.com/store/apps/details?id=com.statebank.gyalsbank' },
+    { bank: 'ХасБанк', packageId: 'com.xacbank.mobile', playUrl: 'https://play.google.com/store/apps/details?id=com.xacbank.mobile' },
+    { bank: 'Худалдаа хөгжлийн банк', packageId: 'mn.tdb.pay', playUrl: 'https://play.google.com/store/apps/details?id=mn.tdb.pay' },
+    { bank: 'Голомт банк', packageId: 'mn.egolomt.new.bank', playUrl: 'https://play.google.com/store/apps/details?id=mn.egolomt.new.bank' }
   ]
 };
 
@@ -280,33 +287,44 @@ window.showPackages = function(){
 };
 
 
+function makeIntentLink(app){
+  const fallback = encodeURIComponent(app.playUrl);
+  return `intent://#Intent;package=${app.packageId};S.browser_fallback_url=${fallback};end`;
+}
+
 function bankOptionsHtml(){
-  return PAYMENT_CONFIG.accounts.map((acc, idx) => `
+  return PAYMENT_CONFIG.bankApps.map((app, idx) => `
     <label class="bankChoice">
       <input type="radio" name="payBank" value="${idx}" ${idx === 0 ? 'checked' : ''} onchange="updateBankDetails()" />
-      <span>${escapeHtml(acc.bank)}</span>
+      <span>${escapeHtml(app.bank)}</span>
     </label>
   `).join('');
 }
 
 function selectedPaymentBank(){
   const idx = Number(document.querySelector('input[name="payBank"]:checked')?.value || 0);
-  return PAYMENT_CONFIG.accounts[idx] || PAYMENT_CONFIG.accounts[0];
+  return PAYMENT_CONFIG.bankApps[idx] || PAYMENT_CONFIG.bankApps[0];
 }
 
-function bankDetailsHtml(acc){
-  const linkPart = acc.link ? `<a class="bankLink" href="${escapeHtml(acc.link)}" target="_blank" rel="noopener">${escapeHtml(acc.bank)} апп / холбоос нээх</a>` : `<span class="bankLink mutedLink">Банкны холбоосыг app.js дотор нэмнэ</span>`;
+function bankDetailsHtml(app){
   return `
-    <div class="invoiceLine"><span>Сонгосон банк</span><b>${escapeHtml(acc.bank)}</b></div>
-    <div class="invoiceLine"><span>Дансны нэр</span><b>${escapeHtml(acc.holder)}</b></div>
-    <div class="invoiceLine"><span>Дансны дугаар</span><b>${escapeHtml(acc.number)}</b></div>
-    <div class="invoiceLine"><span>Банкны холбоос</span>${linkPart}</div>
+    <div class="invoiceLine"><span>Төлөх банкны апп</span><b>${escapeHtml(app.bank)}</b></div>
+    <div class="invoiceLine"><span>Хүлээн авах банк</span><b>${escapeHtml(PAYMENT_CONFIG.receiverBank)}</b></div>
+    <div class="invoiceLine"><span>Хүлээн авагч</span><b>${escapeHtml(PAYMENT_CONFIG.receiverName)}</b></div>
+    <div class="invoiceLine"><span>Дансны дугаар</span><b>${escapeHtml(PAYMENT_CONFIG.accountNumber)}</b></div>
+    <div class="invoiceLine"><span>Банкны код</span><b>${escapeHtml(PAYMENT_CONFIG.bankCode || '')}</b></div>
+    <div class="invoiceLine"><span>Апп</span><button class="bankLink asButton" type="button" onclick="openBankApp()">${escapeHtml(app.bank)} апп нээх</button></div>
   `;
 }
 
 window.updateBankDetails = function(){
   const holder = $('bankDetails');
   if (holder) holder.innerHTML = bankDetailsHtml(selectedPaymentBank());
+};
+
+window.openBankApp = function(){
+  const app = selectedPaymentBank();
+  window.location.href = makeIntentLink(app);
 };
 
 
@@ -321,6 +339,10 @@ function buildRequestObject(phone, bank){
     createdAt: new Date().toISOString(),
     phone,
     bank,
+    receiverBank: PAYMENT_CONFIG.receiverBank,
+    receiverName: PAYMENT_CONFIG.receiverName,
+    accountNumber: PAYMENT_CONFIG.accountNumber,
+    bankCode: PAYMENT_CONFIG.bankCode,
     packageKey: lastSelectedPackageKey,
     packageTitle: pack.title,
     packagePrice: pack.price,
@@ -339,7 +361,11 @@ function buildPaymentRequest(phone, bank){
   const req = buildRequestObject(phone, bank);
   if (!req) return '';
   const d = req.data;
-  return `Эрүүл Бие — Эрүүл Жин төлбөрийн хүсэлт\n\nХүсэлтийн дугаар: ${req.id}\nНэр: ${d.name}\nУтас: ${phone}\nСонгосон багц: ${req.packageTitle}\nТөлөх дүн: ${req.packagePrice}\nТөлсөн банк: ${bank.bank}\nГүйлгээний утга: ${d.name} - ${phone} - ${req.packageMonths} сар\n\nТайлангийн мэдээлэл\nНас: ${d.age}\nХүйс: ${showVal(d.gender)}\nӨндөр: ${d.height} см\nОдоогийн жин: ${d.weight} кг\nЗорилтот жин: ${d.targetWeight} кг\nХасахыг хүсэж буй жин: ${req.targetLoss} кг\nБэлхүүс: ${d.waist || 'бичээгүй'} см\nБиеийн жингийн индекс: ${req.bmi} — ${req.category}\nСонгосон хэлбэр: ${req.routeTitle}\n\nАдмин мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоосыг энэ дугаарт илгээнэ.`;
+  return `Эрүүл Бие — Эрүүл Жин төлбөрийн хүсэлт\n\nХүсэлтийн дугаар: ${req.id}\nНэр: ${d.name}\nУтас: ${phone}\nСонгосон багц: ${req.packageTitle}\nТөлөх дүн: ${req.packagePrice}\nТөлөхөөр сонгосон банкны апп: ${bank.bank}
+Хүлээн авах банк: ${PAYMENT_CONFIG.receiverBank}
+Хүлээн авагч: ${PAYMENT_CONFIG.receiverName}
+Дансны дугаар: ${PAYMENT_CONFIG.accountNumber}
+Банкны код: ${PAYMENT_CONFIG.bankCode || ''}\nГүйлгээний утга: ${d.name} - ${phone} - ${req.packageMonths} сар\n\nТайлангийн мэдээлэл\nНас: ${d.age}\nХүйс: ${showVal(d.gender)}\nӨндөр: ${d.height} см\nОдоогийн жин: ${d.weight} кг\nЗорилтот жин: ${d.targetWeight} кг\nХасахыг хүсэж буй жин: ${req.targetLoss} кг\nБэлхүүс: ${d.waist || 'бичээгүй'} см\nБиеийн жингийн индекс: ${req.bmi} — ${req.category}\nСонгосон хэлбэр: ${req.routeTitle}\n\nАдмин мөнгө орсон эсэхийг шалгаад баталсны дараа тайлангийн холбоосыг энэ дугаарт илгээнэ.`;
 }
 
 function storeLocalRequest(req){
@@ -361,8 +387,16 @@ async function sendRequestToAdmin(req){
 
 window.copyBankInfo = async function(){
   const bank = selectedPaymentBank();
-  const text = `Банк: ${bank.bank}\nДансны нэр: ${bank.holder}\nДансны дугаар: ${bank.number}`;
-  try { await navigator.clipboard.writeText(text); alert('Дансны мэдээлэл хууллаа.'); }
+  const phone = String($('payerPhone')?.value || '').trim();
+  const pack = packageInfo[lastSelectedPackageKey] || {};
+  const name = lastReport?.data?.name || '';
+  const text = `Төлөх банкны апп: ${bank.bank}
+Хүлээн авах банк: ${PAYMENT_CONFIG.receiverBank}
+Хүлээн авагч: ${PAYMENT_CONFIG.receiverName}
+Дансны дугаар: ${PAYMENT_CONFIG.accountNumber}
+Банкны код: ${PAYMENT_CONFIG.bankCode || ''}
+Гүйлгээний утга: ${name} - ${phone || 'утас'} - ${pack.months || ''} сар`;
+  try { await navigator.clipboard.writeText(text); alert('Дансны мэдээлэл хууллаа. Одоо сонгосон банкны апп руу орж шилжүүлгээ хийнэ.'); }
   catch(e){ alert(text); }
 };
 
@@ -373,7 +407,7 @@ window.submitPaymentRequest = async function(){
   const req = buildRequestObject(phone, bank);
   const requestText = buildPaymentRequest(phone, bank);
   if ($('copyArea')) $('copyArea').value = requestText;
-  try { await sendRequestToAdmin(req); } catch(e) { alert('Хүсэлт илгээхэд алдаа гарлаа. Интернэт эсвэл админ тохиргоогоо шалгана уу.'); return; }
+  try { await sendRequestToAdmin(req); } catch(e) { alert('Хүсэлт Firebase рүү илгээгдсэнгүй: ' + (e && e.message ? e.message : e) + '\n\nFirestore Rules хэсгийг түр нээлттэй болгосон эсэхээ шалга.'); return; }
   try { await navigator.clipboard.writeText(requestText); } catch(e) {}
   const sent = $('requestSent');
   if (sent) sent.classList.remove('hidden');
@@ -403,14 +437,15 @@ window.selectPackage = function(key){
         <input id="payerPhone" type="tel" inputmode="tel" placeholder="Жишээ: 99112233" required />
       </label>
 
-      <div class="bankSelectTitle">Төлбөр хийх банкаа сонгоно уу</div>
+      <div class="bankSelectTitle">Төлбөр хийх банкны апп</div>
       <div class="bankGrid">${bankOptionsHtml()}</div>
 
-      <div id="bankDetails" class="invoiceGrid bankDetails">${bankDetailsHtml(PAYMENT_CONFIG.accounts[0])}</div>
+      <div id="bankDetails" class="invoiceGrid bankDetails">${bankDetailsHtml(PAYMENT_CONFIG.bankApps[0])}</div>
 
       <div class="askActions">
         <button class="btn secondary" type="button" onclick="copyBankInfo()">Дансны мэдээлэл хуулах</button>
-        <button class="btn primary" type="button" onclick="submitPaymentRequest()">Админд хүсэлт илгээх</button>
+        <button class="btn secondary" type="button" onclick="openBankApp()">Сонгосон банкны апп нээх</button>
+        <button class="btn primary" type="button" onclick="submitPaymentRequest()">Төлбөр хийсэн — админд илгээх</button>
       </div>
 
       <div id="requestSent" class="pdfReady hidden">

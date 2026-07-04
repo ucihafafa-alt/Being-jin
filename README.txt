@@ -1,4 +1,4 @@
-Эрүүл Бие — Эрүүл Жин v11 FIREBASE ADMIN систем
+Эрүүл Бие — Эрүүл Жин v15 FIREBASE ADMIN систем
 
 Энэ хувилбар Google Apps Script ашиглахгүй.
 Firebase Firestore + Firebase Authentication ашиглана.
@@ -27,3 +27,9 @@ GitHub дээр байршуулах:
 
 Firebase тохируулах:
 FIREBASE_SETUP.txt файлыг унш.
+
+
+V14: ХААН Банкны дансны мэдээлэл оруулсан. Түр тест хийх Firestore rules-ийг firestore-rules.txt дотор нээлттэй болгосон. Ажилласны дараа firestore-rules-secure.txt ашиглаж админ UID оруулна.
+
+
+V15: Төлбөрийн хэсэгт ХААН, Төрийн банк, ХасБанк, Худалдаа хөгжлийн банк, Голомт банкны апп нээх сонголт нэмсэн. IBAN гэж бичихгүй, банкны код гэж харуулна.
