@@ -1,20 +1,17 @@
-/* Firebase тохиргоо
-   1) Firebase console -> Project settings -> Your apps -> Web app config
-   2) Доорх утгуудыг өөрийн Firebase config-оор солино.
-*/
+/* Firebase тохиргоо — configured */
 const firebaseConfig = {
-  apiKey: "FIREBASE_API_KEY_ЭНД",
-  authDomain: "PROJECT_ID.firebaseapp.com",
-  projectId: "PROJECT_ID",
-  storageBucket: "PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID"
+  apiKey: "AIzaSyBjElsLaPDQbS5BOsddvIXCqmkxJWiyJoY",
+  authDomain: "eruul-bie-eruul-jin.firebaseapp.com",
+  projectId: "eruul-bie-eruul-jin",
+  storageBucket: "eruul-bie-eruul-jin.firebasestorage.app",
+  messagingSenderId: "799309402428",
+  appId: "1:799309402428:web:5ee27fe7763e71475fce39"
 };
 
 window.EBEJ_FIREBASE_READY = false;
 try {
-  if (window.firebase && firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('ЭНД') && !firebaseConfig.projectId.includes('PROJECT_ID')) {
-    firebase.initializeApp(firebaseConfig);
+  if (window.firebase && firebaseConfig.apiKey && firebaseConfig.projectId) {
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     window.EBEJ_DB = firebase.firestore();
     if (firebase.auth) window.EBEJ_AUTH = firebase.auth();
     window.EBEJ_FIREBASE_READY = true;

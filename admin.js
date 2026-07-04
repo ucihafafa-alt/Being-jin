@@ -3,7 +3,7 @@ const ADMIN_CONFIG = {
 };
 const $ = (id) => document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
-function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=11`;}
+function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=11v=12`;}
 function setStatus(t){$('adminStatus').textContent=t;}
 function localRequests(){return JSON.parse(localStorage.getItem('ebej_admin_requests') || '[]');}
 function isFirebaseReady(){return window.EBEJ_FIREBASE_READY && window.EBEJ_DB && window.EBEJ_AUTH;}
