@@ -15,7 +15,7 @@
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{
+body{font-size:14px;
   margin:0;
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
   color:var(--text);
@@ -67,7 +67,7 @@ main{max-width:980px;margin:0 auto;padding:28px 14px 42px}
 .paymentBox{margin-top:16px;padding:18px;border-radius:20px;background:#ffffff;border:1px solid var(--line);box-shadow:var(--shadow)}
 .paymentBox h3{font-size:22px;margin:0 0 10px}.paymentBox p{font-size:14px;line-height:1.6;color:#435e57}.invoiceGrid{display:grid;grid-template-columns:1fr;gap:10px;margin:12px 0}.invoiceLine{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fbfffd}.invoiceLine span{display:block;font-size:12px;color:#60756f;font-weight:800}.invoiceLine b{font-size:17px;color:#15342e}.pdfReady{margin-top:12px;padding:14px;border-radius:16px;background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-weight:800}.smallNote{font-size:12px!important;color:#6b8079!important}
 footer{text-align:center;color:#6a7c76;padding:28px 18px 44px;font-size:13px}
-@media (min-width:760px){body{font-size:13px}.heroActions{grid-template-columns:1fr 1fr}.gridTwo{grid-template-columns:1fr 1fr}.stepGrid{grid-template-columns:1fr 1fr}.stepGrid.twoOnly{grid-template-columns:1fr 1fr}.fields{grid-template-columns:1fr 1fr}.choiceGrid{grid-template-columns:repeat(3,1fr)}.resultHeader{grid-template-columns:1.1fr .9fr}.riskPanel{grid-template-columns:1fr 1fr}.miniPackages{grid-template-columns:repeat(4,1fr)}.askActions{grid-template-columns:1fr 1fr}.formWrap{padding:28px}.hero{padding:42px 24px}}
+@media (min-width:760px){body{font-size:14px;font-size:13px}.heroActions{grid-template-columns:1fr 1fr}.gridTwo{grid-template-columns:1fr 1fr}.stepGrid{grid-template-columns:1fr 1fr}.stepGrid.twoOnly{grid-template-columns:1fr 1fr}.fields{grid-template-columns:1fr 1fr}.choiceGrid{grid-template-columns:repeat(3,1fr)}.resultHeader{grid-template-columns:1.1fr .9fr}.riskPanel{grid-template-columns:1fr 1fr}.miniPackages{grid-template-columns:repeat(4,1fr)}.askActions{grid-template-columns:1fr 1fr}.formWrap{padding:28px}.hero{padding:42px 24px}}
 @media (max-width:390px){.hero h1{font-size:30px;letter-spacing:-1px}.subtitle{font-size:15.5px}.attentionCard h2,.notice h2,.sectionTitle h2{font-size:26px}.btn{font-size:15px}.metricGrid{grid-template-columns:1fr}.bmiNumber{font-size:56px}.price{font-size:34px!important}}
 @media print{.hero,.intro,.steps,.notice,.formWrap,.finalCta,footer,.askActions{display:none!important}.result{box-shadow:none;border:0;margin:0;padding:0}.panel,.scoreCard,.metric{break-inside:avoid}.copyArea{display:none}}
 
@@ -86,7 +86,7 @@ footer{text-align:center;color:#6a7c76;padding:28px 18px 44px;font-size:13px}
 .adminHead{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
 .adminHead span{padding:6px 10px;border-radius:999px;background:#e8fffb;color:#0f766e;font-weight:800;font-size:.85rem}
 .reportView .panel{margin-bottom:16px}
-@media print{.btn,.askActions,footer{display:none!important}body{background:#fff}.formWrap{box-shadow:none;border:none;margin:0;max-width:100%;padding:0}.scoreCard{break-inside:avoid}.panel{break-inside:avoid}}
+@media print{.btn,.askActions,footer{display:none!important}body{font-size:14px;background:#fff}.formWrap{box-shadow:none;border:none;margin:0;max-width:100%;padding:0}.scoreCard{break-inside:avoid}.panel{break-inside:avoid}}
 /* v11 firebase admin */
 .smallBtn{padding:8px 12px!important;border-radius:12px!important;font-size:12px!important;margin-left:8px}
 
@@ -128,3 +128,29 @@ footer{text-align:center;color:#6a7c76;padding:28px 18px 44px;font-size:13px}
 .payBankTile b{font-family:Georgia,serif;font-size:16px;text-align:center;color:#fff1d2}
 .payNote{font-size:11px!important;color:#e9d4aa!important;text-align:center;margin:12px 0 0!important}
 @media (max-width:390px){.payDark{padding:14px}.copyAccountBtn{font-size:18px}.bankTileGrid{gap:9px}.payBankTile{min-height:94px}.bankLogoText{height:42px}.payBankTile b{font-size:15px}}
+
+
+/* v17: smaller general font + better payment/admin UI */
+html{font-size:14px!important}
+body{font-size:14px!important;line-height:1.55!important}
+.hero h1{font-size:36px!important;line-height:1.04!important;letter-spacing:-1.2px!important}
+.subtitle{font-size:15px!important;line-height:1.6!important}
+.attentionCard h2,.notice h2,.sectionTitle h2{font-size:25px!important;line-height:1.25!important}
+.formBlock h3,.panel h3{font-size:18px!important}
+label,.panel p,.panel li,.paymentBox p,.personalIntro p{font-size:13px!important;line-height:1.6!important}
+input,select,textarea{font-size:14px!important}
+.btn{font-size:14px!important;padding:14px 18px!important}
+.bmiNumber{font-size:54px!important}.metric b{font-size:18px!important}.price{font-size:28px!important}
+.payDark{padding:16px!important;border-radius:22px!important;background:radial-gradient(circle at 50% 0%,rgba(253,196,91,.24),rgba(58,17,10,.96) 42%,#1f0805 100%)!important}
+.payDark h3{font-size:22px!important}.payPill{font-size:12px!important;text-align:center!important}
+.copyAccountBtn{font-size:17px!important;padding:16px 12px!important;border-radius:24px!important;width:100%!important}
+.bankTileGrid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;margin:14px 0 14px!important}
+.payBankTile{min-height:104px!important;padding:9px!important;border-radius:19px!important;background:rgba(64,18,11,.74)!important;border:1px solid rgba(255,210,122,.36)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04),0 10px 18px rgba(0,0,0,.12)!important}
+.payBankTile.active{outline:2px solid #ffdf7e!important;background:rgba(82,23,11,.92)!important}
+.bankLogoText{height:50px!important;border-radius:14px!important;background:#fff!important;color:#123b35!important;font-size:18px!important;font-family:Arial,system-ui,sans-serif!important;box-shadow:0 6px 12px rgba(0,0,0,.16)!important;letter-spacing:.1px!important}
+.bankLogoText em{font-style:normal;font-weight:950!important}
+.bankLogoText.khan em{color:#006b3f!important;font-size:26px!important}.bankLogoText.golomt em{color:#7138ff!important;font-size:25px!important}.bankLogoText.tdb em{color:#159bd3!important;font-size:21px!important}.bankLogoText.xac em{color:#f05d22!important;font-size:19px!important}.bankLogoText.state em{color:#00a6d6!important;font-size:18px!important}.bankLogoText.mbank em{color:#0a806a!important;font-size:25px!important}.bankLogoText.bogd em{color:#218347!important;font-size:18px!important}.bankLogoText.arig em{color:#6471d7!important;font-size:18px!important}.bankLogoText.sono em{color:#3725a7!important;font-size:17px!important}.bankLogoText.payon em{color:#0d6cc8!important;font-size:17px!important}
+.payBankTile b{font-size:14px!important;font-family:Arial,system-ui,sans-serif!important;color:#fff2d7!important;margin-top:2px!important}
+.payAccountTop{font-size:12px!important}.payNote{font-size:11px!important;line-height:1.45!important}
+.linkBox{padding:12px;border:1px solid rgba(15,118,110,.18);border-radius:16px;background:#f0fffb;margin-top:12px;overflow-wrap:anywhere}.linkBox span{display:block;color:#60756f;font-size:12px;font-weight:850}.linkBox b{display:block;color:#0f766e;font-size:12.5px;line-height:1.5}.smsArea{height:112px!important;font-size:12px!important}.approvedBadge{background:#dcfce7!important;color:#166534!important}
+@media(max-width:390px){.hero h1{font-size:31px!important}.bankTileGrid{gap:8px!important}.payBankTile{min-height:94px!important}.bankLogoText{height:43px!important}.copyAccountBtn{font-size:15px!important}.attentionCard h2,.notice h2,.sectionTitle h2{font-size:22px!important}.btn{font-size:13px!important}.paymentBox{padding:14px!important}}

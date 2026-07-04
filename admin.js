@@ -3,7 +3,7 @@ const ADMIN_CONFIG = {
 };
 const $ = (id) => document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
-function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=16`;}
+function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=17`;}
 function setStatus(t){$('adminStatus').textContent=t;}
 function localRequests(){return JSON.parse(localStorage.getItem('ebej_admin_requests') || '[]');}
 function isFirebaseReady(){return window.EBEJ_FIREBASE_READY && window.EBEJ_DB && window.EBEJ_AUTH;}
@@ -42,6 +42,12 @@ async function loadRequests(){
   }
 }
 
+function reportMessage(link,name,phone){
+  return `${name||'Сайн байна уу'}, таны Эрүүл Бие — Эрүүл Жин тайлан бэлэн боллоо.
+Тайлангаа энд дарж нээнэ үү:
+${link}`;
+}
+
 function render(list){
   const box=$('requestList');
   if(!list.length){box.innerHTML='<div class="panel"><b>Одоогоор хүсэлт алга.</b></div>'; return;}
@@ -49,19 +55,22 @@ function render(list){
     const d=req.data||{};
     const id=req.id || '';
     const link=req.reportLink || reportLink(id);
+    const msg=reportMessage(link, d.name||'', req.phone||'');
+    const approved = (req.status || 'pending') === 'approved';
     return `<article class="adminCard">
-      <div class="adminHead"><b>${esc(d.name||req.name||'Нэргүй')}</b><span>${esc(req.status||'pending')}</span></div>
+      <div class="adminHead"><b>${esc(d.name||req.name||'Нэргүй')}</b><span class="${approved?'approvedBadge':''}">${approved?'БАТЛАГДСАН':'ХҮЛЭЭГДЭЖ БАЙНА'}</span></div>
       <p><b>Утас:</b> ${esc(req.phone||'')}</p>
       <p><b>Багц:</b> ${esc(req.packageTitle||'')} — ${esc(req.packagePrice||'')}</p>
-      <p><b>Банк:</b> ${esc((req.bank&&req.bank.bank)||'')}</p>
+      <p><b>Төлбөр хийхээр сонгосон:</b> ${esc((req.bank&&req.bank.bank)||'')}</p>
       <p><b>БЖИ:</b> ${esc(req.bmi||'')} — ${esc(req.category||'')}</p>
       <p><b>Жин:</b> ${esc(d.weight||'')} кг → ${esc(d.targetWeight||'')} кг, хасах ${esc(req.targetLoss||'')} кг</p>
       <div class="askActions">
-        <button class="btn primary" onclick="approve('${esc(id)}')">Мөнгө орсон — Батлах</button>
-        <button class="btn secondary" onclick="copyLink('${esc(link)}','${esc(d.name||'')}','${esc(req.phone||'')}')">Link хуулах</button>
-        <button class="btn light" onclick="copySms('${esc(link)}','${esc(d.name||'')}','${esc(req.phone||'')}')">Дугаарт явуулах текст</button>
+        ${approved?`<button class="btn light" disabled>Мөнгө батлагдсан</button>`:`<button class="btn primary" onclick="approve('${esc(id)}')">Мөнгө орсон — Батлах</button>`}
+        <button class="btn secondary" onclick="copyLink('${esc(link)}')">Тайлангийн link хуулах</button>
+        <button class="btn light" onclick="copySms('${esc(link)}','${esc(d.name||'')}','${esc(req.phone||'')}')">Дугаарт явуулах текст хуулах</button>
       </div>
-      <textarea readonly class="copyArea">${esc(JSON.stringify(req,null,2))}</textarea>
+      <div class="linkBox"><span>Тайлангийн холбоос</span><b>${esc(link)}</b></div>
+      <textarea readonly class="copyArea smsArea">${esc(msg)}</textarea>
     </article>`;
   }).join('');
 }
@@ -96,7 +105,7 @@ window.approve = async function(id){
 
 window.copyLink = async function(link){await navigator.clipboard.writeText(link).catch(()=>{}); alert('Link хууллаа: '+link);};
 window.copySms = async function(link,name,phone){
-  const msg=`${name||'Сайн байна уу'}, таны Эрүүл Бие — Эрүүл Жин тайлан бэлэн боллоо. Тайлангаа эндээс нээнэ үү: ${link}`;
+  const msg=reportMessage(link,name,phone);
   await navigator.clipboard.writeText(msg).catch(()=>{});
   alert('Дугаарт явуулах текст хууллаа. Утас: '+(phone||''));
 };
