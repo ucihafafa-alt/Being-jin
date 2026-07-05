@@ -16,21 +16,21 @@
       <div>
         <p class="eyebrow">Үнэ төлбөргүй цахим зөвлөмж</p>
         <h1>Зүүнбүрэн сумын<br>Эрүүл мэндийн төв</h1>
-        <p class="lead">Зүүнбүрэн сумын иргэд өөрийн биеийн жингийн индексийг мэдэж авах, халдварт болон халдварт бус өвчлөлийн эрсдэлээс урьдчилан сэргийлэх ерөнхий зөвлөмж авах цахим хуудас.</p>
+        <p class="lead">Зүүнбүрэн сумын иргэд өөрийн биеийн жингийн индексээ мэдэж авч, халдварт болон халдварт бус өвчлөлийн эрсдэлт хүчин зүйлсийн талаар дэлгэрэнгүй асуумж бөглөн урьдчилан сэргийлэх зөвлөмж авах цахим хуудас.</p>
         <div class="hero-actions">
           <a class="btn primary" href="#formCard">Бүртгэл бөглөх</a>
-          <a class="btn ghost" href="admin.html">Админ тайлан</a>
+          <a class="btn ghost" href="#infoCards">Зөвлөмж харах</a>
         </div>
       </div>
-      <div class="hero-card" aria-label="Гол үзүүлэлтүүд">
-        <div class="pulse"></div>
-        <h2>BMI тооцоолол</h2>
-        <p>Өндөр, жин дээр үндэслэн биеийн жингийн индекс болон ангиллыг автоматаар гаргана.</p>
+      <div class="hero-card" aria-label="Эрүүл мэндийн төвийн мэдээлэл">
+        <img class="hero-logo" src="logo.jpg" alt="Зүүнбүрэн сумын эрүүл мэндийн төвийн лого" />
+        <h2>Иргэдэд зориулсан цахим үйлчилгээ</h2>
+        <p>Нэг хуудас дээр иргэний бүртгэл, BMI тооцоолол, халдвар ба халдварт бус өвчлөлийн эрсдэлийн асуумж болон дэлгэрэнгүй зөвлөмжийг харуулна.</p>
         <ul>
-          <li>РД, овог нэр, харьяалал, багийн бүртгэл</li>
-          <li>Халдварт бус өвчлөлийн эрсдэлийн асуумж</li>
-          <li>Иргэн бүрт тохирсон ерөнхий зөвлөмж</li>
-          <li>Админ тайлан, CSV татах боломж</li>
+          <li>РД, овог нэр, харьяалал, багийн мэдээлэл</li>
+          <li>Халдварт бус өвчлөлийн нөлөөлөх хүчин зүйлсийн дэлгэрэнгүй асуумж</li>
+          <li>Халдварт өвчний шинж тэмдгийн урьдчилсан үнэлгээ</li>
+          <li>Хувь хүнд тохирсон дэлгэрэнгүй зөвлөмжийн тайлан</li>
         </ul>
       </div>
     </div>
@@ -45,11 +45,11 @@
       <div class="section-title">
         <p class="eyebrow dark">Иргэний мэдээлэл</p>
         <h2>Биеийн жингийн индекс, эрсдэлийн зөвлөмж авах</h2>
-        <p>Доорх мэдээллийг үнэн зөв бөглөснөөр таны BMI ангилал болон урьдчилан сэргийлэх ерөнхий зөвлөмж гарна.</p>
+        <p>Доорх мэдээллийг үнэн зөв бөглөснөөр таны BMI ангилал, эрсдэлийн түвшин болон урьдчилан сэргийлэх дэлгэрэнгүй зөвлөмж гарна.</p>
       </div>
 
       <form id="healthForm" novalidate>
-        <div class="grid two">
+        <div class="grid one">
           <label>
             <span>Регистрийн дугаар <b>*</b></span>
             <input id="registerNumber" name="registerNumber" type="text" maxlength="10" placeholder="Жишээ: АБ12345678" autocomplete="off" required />
@@ -103,43 +103,68 @@
         </div>
 
         <div class="section-title mini">
-          <p class="eyebrow dark">Эрсдэлийн асуумж</p>
-          <h3>Халдварт болон халдварт бус өвчлөлийн урьдчилсан асуумж</h3>
+          <p class="eyebrow dark">Дэлгэрэнгүй асуумж</p>
+          <h3>Халдварт бус өвчлөлийн нөлөөлөх хүчин зүйлс, халдварт өвчний эрсдэлийн асуумж</h3>
         </div>
 
         <div class="questions">
           <fieldset>
-            <legend>Та долоо хоногт 3-аас дээш өдөр 30 минутаас багагүй хөдөлгөөн хийдэг үү?</legend>
+            <legend>1. Та долоо хоногт 5 өдөр, өдөр бүр 30 минутаас багагүй хөдөлгөөн хийдэг үү?</legend>
             <label class="radio"><input type="radio" name="activity" value="yes" required /> Тийм</label>
             <label class="radio"><input type="radio" name="activity" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
-            <legend>Та тамхи татдаг уу?</legend>
-            <label class="radio"><input type="radio" name="smoking" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="smoking" value="no" /> Үгүй</label>
+            <legend>2. Та өдөр бүр 5 ба түүнээс дээш нэгж жимс, хүнсний ногоо хэрэглэдэг үү?</legend>
+            <label class="radio"><input type="radio" name="fruitVeg" value="yes" required /> Тийм</label>
+            <label class="radio"><input type="radio" name="fruitVeg" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
-            <legend>Та архи, согтууруулах ундаа хэрэглэдэг үү?</legend>
-            <label class="radio"><input type="radio" name="alcohol" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="alcohol" value="no" /> Үгүй</label>
-          </fieldset>
-          <fieldset>
-            <legend>Та давс, өөх тос, чихэрлэг хүнс их хэрэглэдэг үү?</legend>
+            <legend>3. Та давс, өөх тос, шарсан болон чихэрлэг хүнсийг долоо хоногт 3-аас дээш удаа хэрэглэдэг үү?</legend>
             <label class="radio"><input type="radio" name="diet" value="yes" required /> Тийм</label>
             <label class="radio"><input type="radio" name="diet" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
-            <legend>Танд даралт ихсэх зовиур байдаг уу?</legend>
+            <legend>4. Та чихэртэй ундаа, хийжүүлсэн ундаа тогтмол хэрэглэдэг үү?</legend>
+            <label class="radio"><input type="radio" name="sugaryDrink" value="yes" required /> Тийм</label>
+            <label class="radio"><input type="radio" name="sugaryDrink" value="no" /> Үгүй</label>
+          </fieldset>
+          <fieldset>
+            <legend>5. Та тамхи татдаг уу?</legend>
+            <label class="radio"><input type="radio" name="smoking" value="yes" required /> Тийм</label>
+            <label class="radio"><input type="radio" name="smoking" value="no" /> Үгүй</label>
+          </fieldset>
+          <fieldset>
+            <legend>6. Та архи, согтууруулах ундаа хэрэглэдэг үү?</legend>
+            <label class="radio"><input type="radio" name="alcohol" value="yes" required /> Тийм</label>
+            <label class="radio"><input type="radio" name="alcohol" value="no" /> Үгүй</label>
+          </fieldset>
+          <fieldset>
+            <legend>7. Танд даралт ихсэх, толгой өвдөх, зүрх дэлсэх зэрэг зовиур байдаг уу?</legend>
             <label class="radio"><input type="radio" name="bloodPressure" value="yes" required /> Тийм</label>
             <label class="radio"><input type="radio" name="bloodPressure" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
-            <legend>Гэр бүлд даралт ихсэх, чихрийн шижин, зүрх судасны өвчний түүх бий юу?</legend>
+            <legend>8. Цусны сахар ихсэж байсан, эсвэл шөнө ойрхон шээх, их цангах зэрэг шинж илэрдэг үү?</legend>
+            <label class="radio"><input type="radio" name="glucoseRisk" value="yes" required /> Тийм</label>
+            <label class="radio"><input type="radio" name="glucoseRisk" value="no" /> Үгүй</label>
+          </fieldset>
+          <fieldset>
+            <legend>9. Та өдөрт 7 цагаас бага унтаж, эсвэл байнгын стресс, ядаргаа мэдэрдэг үү?</legend>
+            <label class="radio"><input type="radio" name="stressSleep" value="yes" required /> Тийм</label>
+            <label class="radio"><input type="radio" name="stressSleep" value="no" /> Үгүй</label>
+          </fieldset>
+          <fieldset>
+            <legend>10. Гэр бүлд даралт ихсэх, чихрийн шижин, зүрх судасны өвчний түүх бий юу?</legend>
             <label class="radio"><input type="radio" name="familyHistory" value="yes" required /> Тийм</label>
             <label class="radio"><input type="radio" name="familyHistory" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
-            <legend>Одоогоор ханиалгах, халуурах, хоолой өвдөх шинж тэмдэг байгаа юу?</legend>
+            <legend>11. Та сүүлийн 1 жилд урьдчилан сэргийлэх үзлэгт хамрагдсан уу?</legend>
+            <label class="radio"><input type="radio" name="screening" value="yes" required /> Тийм</label>
+            <label class="radio"><input type="radio" name="screening" value="no" /> Үгүй</label>
+          </fieldset>
+          <fieldset>
+            <legend>12. Одоогоор халуурах, ханиалгах, хоолой өвдөх, хамар битүүрэх зэрэг шинж тэмдэг байна уу?</legend>
             <label class="radio"><input type="radio" name="infectionSymptoms" value="yes" required /> Тийм</label>
             <label class="radio"><input type="radio" name="infectionSymptoms" value="no" /> Үгүй</label>
           </fieldset>
@@ -169,26 +194,28 @@
       </div>
     </section>
 
-    <section class="info-grid">
+    <section id="infoCards" class="info-grid">
       <article class="info-card">
         <h3>Халдварт бус өвчнөөс сэргийлэх</h3>
-        <p>Давс, өөх тос, чихэрлэг хүнсний хэрэглээг багасгах, хөдөлгөөн нэмэх, даралт болон сахараа тогтмол хянах нь чухал.</p>
+        <p>Хөдөлгөөн дутмаг байдал, буруу хооллолт, таргалалт, тамхи, архи, стресс, нойр дутуу байдал нь даралт ихсэх, чихрийн шижин, зүрх судасны өвчний эрсдэлийг нэмэгдүүлдэг.</p>
       </article>
       <article class="info-card">
         <h3>Халдварт өвчнөөс сэргийлэх</h3>
-        <p>Гараа тогтмол угаах, амны хаалт хэрэглэх, шинж тэмдэг илэрвэл бусдад халдвар тараахаас сэргийлж ЭМТ-д хандаарай.</p>
+        <p>Гараа тогтмол угаах, хүн олонтой газарт амны хаалт хэрэглэх, шинж тэмдэг илэрвэл бусдад халдвар тараахаас сэргийлж ЭМТ-д хандах нь чухал.</p>
       </article>
       <article class="info-card">
         <h3>Урьдчилан сэргийлэх үзлэг</h3>
-        <p>Өөрийн эрүүл мэндийн үзүүлэлтээ тогтмол мэдэж, шаардлагатай үед мэргэжлийн эмчид үзүүлэх нь хамгийн зөв алхам юм.</p>
+        <p>Жилд дор хаяж 1 удаа урьдчилан сэргийлэх үзлэгт хамрагдаж, даралт, цусны сахар, жин болон бусад үзүүлэлтээ тогтмол хянахыг зөвлөж байна.</p>
       </article>
     </section>
   </main>
 
   <footer>
     <div class="wrap footer-grid">
-      <p>© <span id="year"></span> Зүүнбүрэн сумын Эрүүл мэндийн төв</p>
-      <a href="admin.html">Админ тайлан</a>
+      <div>
+        <p>© <span id="year"></span> Зүүнбүрэн сумын Эрүүл мэндийн төв</p>
+        <small class="credits">Зохиогч, хөгжүүлэгч: L.BATTSOG.</small>
+      </div>
     </div>
   </footer>
 

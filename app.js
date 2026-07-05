@@ -68,8 +68,10 @@ form.addEventListener("submit", async (event) => {
       riskScore: result.riskScore,
       riskLevel: result.riskLevel,
       infectionRisk: result.infectionRisk,
+      lifestyleRiskCount: result.lifestyleRiskCount,
       answers: data.answers,
       advices: result.advices,
+      adviceSummary: result.adviceSummary,
       purpose: "Зүүнбүрэн сумын ЭМТ урьдчилан сэргийлэх үзлэг, зөвлөгөө, нэгтгэл тайлан"
     };
 
@@ -125,7 +127,7 @@ function readForm() {
   if (!Number.isFinite(height) || height < 80 || height > 230) throw new Error("Өндрөө см-ээр зөв оруулна уу.");
   if (!Number.isFinite(weight) || weight < 20 || weight > 250) throw new Error("Жингээ кг-аар зөв оруулна уу.");
 
-  const requiredRadios = ["activity", "smoking", "alcohol", "diet", "bloodPressure", "familyHistory", "infectionSymptoms"];
+  const requiredRadios = ["activity", "fruitVeg", "diet", "sugaryDrink", "smoking", "alcohol", "bloodPressure", "glucoseRisk", "stressSleep", "familyHistory", "screening", "infectionSymptoms"];
   const answers = {};
   for (const key of requiredRadios) {
     const value = String(fd.get(key) || "");
@@ -153,64 +155,109 @@ function buildResult(data) {
   const bmiCategory = getBmiCategory(bmi);
   const advices = [];
   let riskScore = 0;
+  let lifestyleRiskCount = 0;
 
   if (data.answers.activity === "no") {
     riskScore += 1;
-    advices.push("Долоо хоногт 5 өдөр, өдөр бүр 30 минут орчим алхах болон өөрт тохирсон хөдөлгөөн хийхийг зөвлөж байна.");
+    lifestyleRiskCount += 1;
+    advices.push("Хөдөлгөөний зөвлөмж: Өдөр бүр дор хаяж 30 минут идэвхтэй алхах, долоо хоногт 5 өдөр тогтмол хөдөлгөөн хийхийг зөвлөж байна.");
+  }
+  if (data.answers.fruitVeg === "no") {
+    riskScore += 1;
+    lifestyleRiskCount += 1;
+    advices.push("Хооллолтын зөвлөмж: Өдөр бүр жимс, хүнсний ногооны хэрэглээг нэмэгдүүлж, шим тэжээлийн тэнцвэртэй хооллолтыг хэвшүүлээрэй.");
   }
   if (data.answers.diet === "yes") {
     riskScore += 1;
-    advices.push("Давс, өөх тос, чихэрлэг хүнсний хэрэглээг багасгаж, ногоо, ус, энгийн хооллолтыг нэмэгдүүлэхийг зөвлөж байна.");
+    lifestyleRiskCount += 1;
+    advices.push("Давс, тос, чихрийн хэрэглээ: Давс, өөх тос, шарсан болон чихэрлэг хүнсний хэрэглээг багасгаж, буцалгаж болгосон энгийн хоол түлхүү хэрэглэнэ үү.");
+  }
+  if (data.answers.sugaryDrink === "yes") {
+    riskScore += 1;
+    lifestyleRiskCount += 1;
+    advices.push("Ундааны зөвлөмж: Чихэртэй, хийжүүлсэн ундааны оронд ус, чихэргүй цай, шөл, цэвэр шингэн хэрэглэж хэвшээрэй.");
   }
   if (data.answers.smoking === "yes") {
-    riskScore += 1;
-    advices.push("Тамхинаас татгалзах нь зүрх судас, уушги болон ерөнхий эрүүл мэндийн эрсдэлийг бууруулахад чухал.");
+    riskScore += 2;
+    lifestyleRiskCount += 1;
+    advices.push("Тамхины эрсдэл: Тамхинаас татгалзах нь зүрх судас, уушги, хавдрын эрсдэлийг бууруулах хамгийн чухал алхам юм.");
   }
   if (data.answers.alcohol === "yes") {
     riskScore += 1;
-    advices.push("Архи, согтууруулах ундааны хэрэглээг багасгах, боломжтой бол татгалзахыг зөвлөж байна.");
+    lifestyleRiskCount += 1;
+    advices.push("Архины зөвлөмж: Архи, согтууруулах ундааны хэрэглээг бууруулах, боломжтой бол бүрэн татгалзахыг зөвлөж байна.");
   }
   if (data.answers.bloodPressure === "yes") {
     riskScore += 2;
-    advices.push("Даралтаа тогтмол хэмжиж, Зүүнбүрэн сумын Эрүүл мэндийн төвд хандаж зөвлөгөө авна уу.");
+    advices.push("Даралтын эрсдэл: Даралтаа тогтмол хэмжиж, толгой өвдөх, зүрх дэлсэх, ядрах зовиур давтагдвал ЭМТ-д үзүүлж зөвлөгөө аваарай.");
+  }
+  if (data.answers.glucoseRisk === "yes") {
+    riskScore += 2;
+    advices.push("Сахарын эрсдэл: Цусны сахарын шинжилгээ өгч, их цангах, ойр ойрхон шээх зэрэг шинж илэрвэл яаралтай ЭМТ-д хандан үнэлгээ хийлгээрэй.");
+  }
+  if (data.answers.stressSleep === "yes") {
+    riskScore += 1;
+    lifestyleRiskCount += 1;
+    advices.push("Нойр ба стресс: Өдөрт 7-8 цаг унтаж амрах, стрессээ зохицуулах, ажлын ачааллаа тэнцвэржүүлэх нь дархлаа болон бодисын солилцоонд тустай.");
   }
   if (data.answers.familyHistory === "yes") {
     riskScore += 1;
-    advices.push("Гэр бүлийн өвчний түүх байгаа тул даралт, цусны сахар, жингээ тогтмол хянахыг зөвлөж байна.");
+    advices.push("Удамшлын эрсдэл: Гэр бүлийн өвчний түүх байгаа тул даралт, цусны сахар, холестерин, жингээ тогтмол хянах хэрэгтэй.");
+  }
+  if (data.answers.screening === "no") {
+    riskScore += 1;
+    advices.push("Урьдчилан сэргийлэх үзлэг: Сүүлийн 1 жилд үзлэгт хамрагдаагүй бол Зүүнбүрэн сумын Эрүүл мэндийн төвд үзлэгт хамрагдахыг зөвлөж байна.");
   }
 
-  if (bmi >= 25 && bmi < 30) {
+  if (bmi < 18.5) {
+    advices.push("BMI үнэлгээ: Жингийн дутагдалтай ангилалд орж байна. Тэжээллэг хооллолт, биеийн ерөнхий байдлын үнэлгээ хийлгэх талаар ЭМТ-д зөвлөгөө аваарай.");
+  } else if (bmi >= 25 && bmi < 30) {
     riskScore += 1;
-    advices.push("Илүүдэл жинг бууруулахын тулд хоолны хэмжээ, давс, тос, амттаны хэрэглээг багасгаж хөдөлгөөнөө нэмэгдүүлээрэй.");
-  } else if (bmi >= 30) {
+    advices.push("BMI үнэлгээ: Илүүдэл жингийн ангилалд орж байна. Хоолны хэмжээг тохируулах, давс тос багасгах, алхалтыг нэмэгдүүлэх нь үр дүнтэй.");
+  } else if (bmi >= 30 && bmi < 35) {
     riskScore += 2;
-    advices.push("Таргалалтын ангилалд орж байгаа тул ЭМТ-д хандаж жин бууруулах, даралт болон сахарын эрсдэлийн талаар зөвлөгөө аваарай.");
-  } else if (bmi < 18.5) {
-    advices.push("Жингийн дутагдалтай ангилалд орж байгаа тул хооллолт, шим тэжээлийн талаар ЭМТ-д зөвлөгөө аваарай.");
+    advices.push("BMI үнэлгээ: Таргалалт I зэрэгт орж байна. Жинг бууруулах зорилтот төлөвлөгөө гаргаж, даралт болон сахарын эрсдлээ хянах шаардлагатай.");
+  } else if (bmi >= 35 && bmi < 40) {
+    riskScore += 3;
+    advices.push("BMI үнэлгээ: Таргалалт II зэрэгт орж байна. ЭМТ-д заавал хандаж дэлгэрэнгүй зөвлөгөө, үзлэг шинжилгээ авах шаардлагатай.");
+  } else if (bmi >= 40) {
+    riskScore += 4;
+    advices.push("BMI үнэлгээ: Таргалалт III зэрэгт орж байна. ЭМТ-д ойрын хугацаанд хандаж эмчийн хяналттайгаар үзлэг, зөвлөгөө авахыг зөвлөж байна.");
+  } else {
+    advices.push("BMI үнэлгээ: Таны биеийн жингийн индекс хэвийн ангилалд байна. Одоогийн зөв дадлаа тогтвортой хадгалахыг зөвлөж байна.");
   }
 
   if (data.age >= 45) {
     riskScore += 1;
-    advices.push("45-аас дээш насанд даралт, сахар, өөх тосны үзүүлэлтээ тогтмол хянах нь зүйтэй.");
+    advices.push("Насны зөвлөмж: 45-аас дээш насанд даралт, сахар, зүрх судасны эрсдэлийн үзүүлэлтээ тогтмол хянах нь зүйтэй.");
   }
 
   let infectionRisk = "Ерөнхий урьдчилан сэргийлэлт";
   if (data.answers.infectionSymptoms === "yes") {
     riskScore += 1;
     infectionRisk = "Шинж тэмдэг илэрсэн";
-    advices.push("Ханиалгах, халуурах, хоолой өвдөх шинж илэрсэн бол бусдад халдвар тараахаас сэргийлж амны хаалт хэрэглэн ЭМТ-д хандана уу.");
+    advices.push("Халдварт өвчний зөвлөмж: Халуурах, ханиалгах, хоолой өвдөх шинж илэрсэн бол амны хаалт хэрэглэж, бусадтай ойр хавьтлаас зайлсхийж, ЭМТ-д хандаарай.");
+  } else {
+    advices.push("Халдварт өвчнөөс сэргийлэх зөвлөмж: Гараа тогтмол савандаж угаах, агаар сэлгэлт сайтай орчинд байх, шаардлагатай үед амны хаалт хэрэглэхийг зөвлөж байна.");
   }
 
-  advices.push("Гараа тогтмол савандаж угаах, олон хүнтэй газарт амны хаалт хэрэглэх, дархлаажуулалт болон урьдчилан сэргийлэх үзлэгт хамрагдахыг зөвлөж байна.");
+  const riskLevel = getRiskLevel(riskScore);
+  const adviceSummary = buildAdviceSummary(bmiCategory, riskLevel, lifestyleRiskCount, infectionRisk);
 
   return {
     bmi,
     bmiCategory,
     riskScore,
-    riskLevel: getRiskLevel(riskScore),
+    riskLevel,
     infectionRisk,
+    lifestyleRiskCount,
+    adviceSummary,
     advices: unique(advices)
   };
+}
+
+function buildAdviceSummary(bmiCategory, riskLevel, lifestyleRiskCount, infectionRisk) {
+  return `Таны BMI ангилал: ${bmiCategory}. Нийт эрсдэлийн түвшин: ${riskLevel}. Амьдралын хэв маягтай холбоотой ${lifestyleRiskCount} эрсдэлт хүчин зүйл илэрлээ. Халдварт өвчний төлөв: ${infectionRisk}. Дараах зөвлөмжүүдийг хэрэгжүүлснээр эрсдэлийг бууруулах боломжтой.`;
 }
 
 function showResult(data, result) {
@@ -224,10 +271,19 @@ function showResult(data, result) {
     </div>
     <div class="summary-box">
       <p><b>${escapeHtml(data.fullName)}</b> — ${data.age} нас, ${escapeHtml(data.gender)}, ${escapeHtml(data.bag)}.</p>
+      <p><b>Товч дүгнэлт:</b> ${escapeHtml(result.adviceSummary)}</p>
       <p>Халдварт өвчний эрсдэлийн төлөв: <b>${escapeHtml(result.infectionRisk)}</b></p>
     </div>
-    <h3>Танд өгөх ерөнхий зөвлөмж</h3>
-    <ul class="advice-list">${adviceHtml}</ul>
+    <div class="detail-panels">
+      <div class="detail-panel">
+        <h3>Ерөнхий тайлбар</h3>
+        <p>Хариултаас харахад таны эрүүл мэндэд нөлөөлж болзошгүй амьдралын хэв маяг, хооллолт болон урьдчилан сэргийлэх үзлэгтэй холбоотой хүчин зүйлс байна. Доорх зөвлөмжүүдийг шат дараатай хэрэгжүүлэх нь зүйтэй.</p>
+      </div>
+      <div class="detail-panel">
+        <h3>Хэрэгжүүлэх зөвлөмж</h3>
+        <ul class="advice-list">${adviceHtml}</ul>
+      </div>
+    </div>
     <p class="small-note">Энэхүү зөвлөмж нь онош, эмчилгээний заалт биш. Зовиур илэрвэл Зүүнбүрэн сумын Эрүүл мэндийн төвд хандана уу.</p>
   `;
   resultCard.classList.remove("hidden");
@@ -244,8 +300,8 @@ function getBmiCategory(bmi) {
 }
 
 function getRiskLevel(score) {
-  if (score <= 2) return "Бага";
-  if (score <= 5) return "Дунд";
+  if (score <= 3) return "Бага";
+  if (score <= 7) return "Дунд";
   return "Өндөр";
 }
 
