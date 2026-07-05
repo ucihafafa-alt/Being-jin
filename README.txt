@@ -1,24 +1,32 @@
-Эрүүл Бие — Эрүүл Жин v20 PREMIUM
+Зүүнбүрэн сумын Эрүүл мэндийн төв — BMI ба урьдчилан сэргийлэх зөвлөмжийн web
 
 Файлууд:
-- index.html — хэрэглэгчийн асуумж, BMI, багц, төлбөрийн хүсэлт
-- app.js — v20 detailed report + improved bank UI
-- admin.html — v20 admin page
-- admin.js — v20 admin SMS/admin link fix
-- report.html — батлагдсан хэрэглэгчийн дэлгэрэнгүй 30/60/90/180 хоногийн тайлан
-- style.css — бүх дэлгэц, банк, report, admin дизайн
-- firebase-config.js — Firebase config
-- firestore-rules.txt — түр нээлттэй тест rules
-- firestore-rules-secure.txt — admin UID-тэй хамгаалалттай rules
-- manifest.json, sw.js — PWA суурь
-- hero.jpg, balance.jpg, energy.jpg — нүүр зураг/дизайн материал
+- index.html      Иргэн бөглөх нүүр хуудас
+- app.js          BMI тооцоолол, зөвлөмж, Firebase хадгалалт
+- admin.html      Админ тайлангийн хуудас
+- admin.js        Firebase Auth, Firestore тайлан, CSV татах
+- firebase-config.js  Firebase тохиргоо, admin email тохиргоо
+- style.css       Дизайн
+- firebase-rules.txt Firestore security rules
+- manifest.json, sw.js, favicon.svg  PWA үндсэн файлууд
 
-GitHub дээр repo-ийн root дотор бүгдийг upload хийнэ.
-Нээх линк: index.html?v=20
-Админ: admin.html?v=20
-Тайлан: report.html?id=REQUEST_ID&v=20
+GitHub дээр оруулах:
+1. ZIP-ээ задлаад доторх бүх файлыг GitHub repository-ийн root хавтас руу upload хийнэ.
+2. ZIP файлыг өөрийг нь upload хийхгүй.
+3. GitHub Pages асаасан repository дээр index.html шууд нээгдэнэ.
+
+Firebase тохируулах:
+1. Firebase Console дээр project үүсгэнэ.
+2. Build → Firestore Database → Create database.
+3. Build → Authentication → Sign-in method → Google provider Enable.
+4. Project settings → Your apps → Web app үүсгээд firebaseConfig-г хуулна.
+5. firebase-config.js доторх PASTE_... утгуудыг солино.
+6. ADMIN_EMAILS хэсэгт админ тайлан харах Gmail хаягаа бичнэ.
+7. Firestore → Rules хэсэгт firebase-rules.txt файлын агуулгыг хуулж Publish хийнэ.
+8. Firebase Authentication → Settings → Authorized domains дээр GitHub Pages домэйнээ нэмнэ.
 
 Анхаарах:
-- Firestore rules-г тест үед firestore-rules.txt ашиглаж болно.
-- Бэлэн бол secure rules рүү шилжүүлээд ADMIN_UID_ЭНД_БИЧНЭ хэсгийг өөрийн UID-р солино.
-- Admin мөнгө баталсны дараа report.html link хэрэглэгчид илгээгдэнэ.
+- РД-г шууд document id болгохгүй, browser дээр SHA-256 hash болгож хадгалалтын id үүсгэнэ.
+- Иргэн мэдээлэл submit хийх эрхтэй, бусдын мэдээлэл унших эрхгүй.
+- Админ тайлан зөвхөн ADMIN_EMAILS-д бичсэн Gmail-ээр харагдана.
+- CSV татах товч нь админ дэлгэц дээрх шүүгдсэн бүртгэлийг Excel-д нээгдэх CSV болгон татна.

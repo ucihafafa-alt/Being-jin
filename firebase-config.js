@@ -1,22 +1,19 @@
-/* Firebase тохиргоо — configured */
-const firebaseConfig = {
-  apiKey: "AIzaSyBjElsLaPDQbS5BOsddvIXCqmkxJWiyJoY",
-  authDomain: "eruul-bie-eruul-jin.firebaseapp.com",
-  projectId: "eruul-bie-eruul-jin",
-  storageBucket: "eruul-bie-eruul-jin.firebasestorage.app",
-  messagingSenderId: "799309402428",
-  appId: "1:799309402428:web:5ee27fe7763e71475fce39"
+// Firebase тохиргоо
+// Firebase Console → Project settings → Your apps → Web app config хэсгээс доорх утгуудыг солино.
+
+export const firebaseConfig = {
+  apiKey: "PASTE_YOUR_API_KEY_HERE",
+  authDomain: "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "PASTE_YOUR_PROJECT_ID",
+  storageBucket: "PASTE_YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
+  appId: "PASTE_YOUR_APP_ID"
 };
 
-window.EBEJ_FIREBASE_READY = false;
-try {
-  if (window.firebase && firebaseConfig.apiKey && firebaseConfig.projectId) {
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    window.EBEJ_DB = firebase.firestore();
-    if (firebase.auth) window.EBEJ_AUTH = firebase.auth();
-    window.EBEJ_FIREBASE_READY = true;
-  }
-} catch (e) {
-  console.error('Firebase init error', e);
-  window.EBEJ_FIREBASE_READY = false;
-}
+// Админ тайлан харах эрхтэй Gmail хаягууд.
+// Жишээ: ["ucihafafa@gmail.com", "doctor@example.com"]
+export const ADMIN_EMAILS = [
+  "ucihafafa@gmail.com"
+];
+
+export const COLLECTION_NAME = "bmi_submissions";

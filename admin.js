@@ -1,156 +1,261 @@
-// v21 checked: detailed report + sms/admin link fix
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister())).catch(()=>{});
-  if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
-}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { firebaseConfig, ADMIN_EMAILS, COLLECTION_NAME } from "./firebase-config.js";
 
-const ADMIN_CONFIG = {
-  reportBaseUrl: 'https://ucihafafa-alt.github.io/Being-jin/report.html'
-};
 const $ = (id) => document.getElementById(id);
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
-function reportLink(id){return `${ADMIN_CONFIG.reportBaseUrl}?id=${encodeURIComponent(id)}&v=21`;}
-function setStatus(t){$('adminStatus').textContent=t;}
-function localRequests(){return JSON.parse(localStorage.getItem('ebej_admin_requests') || '[]');}
-function isFirebaseReady(){return window.EBEJ_FIREBASE_READY && window.EBEJ_DB && window.EBEJ_AUTH;}
+const loginBtn = $("loginBtn");
+const logoutBtn = $("logoutBtn");
+const dashboard = $("dashboard");
+const loginNotice = $("loginNotice");
+const statsGrid = $("statsGrid");
+const recordsBody = $("recordsBody");
+const tableCount = $("tableCount");
+const searchInput = $("searchInput");
+const monthFilter = $("monthFilter");
+const csvBtn = $("csvBtn");
+const refreshBtn = $("refreshBtn");
 
-async function signInAdmin(){
-  if(!isFirebaseReady()){ alert('Firebase тохиргоо хийгдээгүй байна. firebase-config.js-ээ бөглөнө үү.'); return; }
-  const provider = new firebase.auth.GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
-  try{
-    await window.EBEJ_AUTH.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-    // Гар утасны browser дээр popup хаагдах/буцах асуудал гардаг тул redirect ашиглав.
-    await window.EBEJ_AUTH.signInWithRedirect(provider);
-  }catch(e){
-    console.error(e);
-    alert('Google нэвтрэлт эхлүүлэхэд алдаа гарлаа. Firebase Authentication дээр Google provider асаасан эсэх, Authorized domains дээр ucihafafa-alt.github.io байгаа эсэхийг шалга.');
-  }
-}
-async function signOutAdmin(){ if(window.EBEJ_AUTH) await window.EBEJ_AUTH.signOut(); }
+let auth, db;
+let allRecords = [];
+let filteredRecords = [];
 
-async function loadRequests(){
-  if(!isFirebaseReady()){
-    setStatus('Firebase тохиргоо хийгдээгүй байна. firebase-config.js-ээ шалга.');
-    render([]);
-    return;
-  }
-  const user = window.EBEJ_AUTH.currentUser;
-  setStatus(user ? `Firebase-ээс хүсэлтүүд татаж байна... Нэвтэрсэн: ${user.email}` : 'Firebase-ээс хүсэлтүүд татаж байна... /түр нээлттэй rules байвал loginгүй уншина/');
-  try{
-    const snap = await window.EBEJ_DB.collection('requests').orderBy('createdAt','desc').limit(200).get();
-    const list = snap.docs.map(d => ({...d.data(), id: d.id}));
-    setStatus(user ? `Нийт ${list.length} хүсэлт байна. Нэвтэрсэн: ${user.email}` : `Нийт ${list.length} хүсэлт байна. /Rules нээлттэй горим/`);
-    render(list);
-  }catch(e){
-    console.error(e);
-    setStatus('Хүсэлт татахад алдаа гарлаа. Firestore → Rules дээр түр allow read/update true тавьсан эсэхээ шалга.');
-  }
+try {
+  const app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+} catch (error) {
+  loginNotice.textContent = "Firebase тохиргоо ороогүй байна. firebase-config.js файлыг бөглөнө үү.";
+  console.error(error);
 }
 
-function reportMessage(link,name,phone){
-  return `${name||'Сайн байна уу'}, таны Эрүүл Бие — Эрүүл Жин тайлан бэлэн боллоо.
-Тайлангаа энд дарж нээнэ үү:
-${link}`;
-}
-
-function render(list){
-  const box=$('requestList');
-  if(!list.length){box.innerHTML='<div class="panel"><b>Одоогоор хүсэлт алга.</b></div>'; return;}
-  box.innerHTML=list.map(req=>{
-    const d=req.data||{};
-    const id=req.id || '';
-    const link=req.reportLink || reportLink(id);
-    const msg=reportMessage(link, d.name||'', req.phone||'');
-    const approved = (req.status || 'pending') === 'approved';
-    return `<article class="adminCard">
-      <div class="adminHead"><b>${esc(d.name||req.name||'Нэргүй')}</b><span class="${approved?'approvedBadge':''}">${approved?'БАТЛАГДСАН':'ХҮЛЭЭГДЭЖ БАЙНА'}</span></div>
-      <p><b>Утас:</b> ${esc(req.phone||'')}</p>
-      <p><b>Багц:</b> ${esc(req.packageTitle||'')} — ${esc(req.packagePrice||'')}</p>
-      <p><b>Төлбөр хийхээр сонгосон:</b> ${esc((req.bank&&req.bank.bank)||'')}</p>
-      <p><b>БЖИ:</b> ${esc(req.bmi||'')} — ${esc(req.category||'')}</p>
-      <p><b>Жин:</b> ${esc(d.weight||'')} кг → ${esc(d.targetWeight||'')} кг, хасах ${esc(req.targetLoss||'')} кг</p>
-      <div class="askActions">
-        ${approved?`<button class="btn light" disabled>Мөнгө батлагдсан</button>`:`<button class="btn primary" onclick="approve('${esc(id)}')">Мөнгө орсон — Батлах</button>`}
-        <button class="btn secondary" onclick="copyLink('${esc(link)}')">Тайлангийн link хуулах</button>
-        <a class="btn light" href="${esc(link)}" target="_blank" rel="noopener">Тайлан харах</a>
-        <button class="btn light" onclick="copySms('${esc(link)}','${esc(d.name||'')}','${esc(req.phone||'')}')">Дугаарт явуулах текст хуулах</button>
-        <button class="btn primary" onclick="openSms('${encodeURIComponent(req.phone||'')}','${encodeURIComponent(link)}','${encodeURIComponent(d.name||'')}','sms')">SMS нээх</button>
-        <button class="btn secondary" onclick="openSms('${encodeURIComponent(req.phone||'')}','${encodeURIComponent(link)}','${encodeURIComponent(d.name||'')}','smsto')">SMS нөөц хувилбар</button>
-      </div>
-      <div class="linkBox"><span>Тайлангийн холбоос</span><b>${esc(link)}</b></div>
-      <textarea readonly class="copyArea smsArea">${esc(msg)}</textarea>
-    </article>`;
-  }).join('');
-}
-
-window.approve = async function(id){
-  if(!id){alert('ID алга'); return;}
-  const link = reportLink(id);
-  if(isFirebaseReady()){
-    try{
-      const user = window.EBEJ_AUTH.currentUser;
-      await window.EBEJ_DB.collection('requests').doc(id).update({
-        status:'approved',
-        approvedAt: new Date().toISOString(),
-        approvedBy: user ? (user.email || '') : 'admin',
-        reportLink: link
-      });
-      await navigator.clipboard.writeText(link).catch(()=>{});
-      alert('Батлагдлаа. Тайлангийн link хууллаа. Одоо хэрэглэгчийн утасны дугаарт явуул.\n\n'+link);
-      loadRequests();
-    }catch(e){
-      console.error(e);
-      alert('Батлахад алдаа гарлаа. Firestore Rules дээр update зөвшөөрсөн эсэхээ шалга.');
+loginBtn.addEventListener("click", async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  } catch (error) {
+    if (String(error?.code).includes("popup")) {
+      await signInWithRedirect(auth, new GoogleAuthProvider());
+    } else {
+      alert("Нэвтрэх үед алдаа гарлаа: " + (error.message || error));
     }
-    return;
-  }
-  const list=localRequests().map(r=>r.id===id?{...r,status:'approved',reportLink:link}:r);
-  localStorage.setItem('ebej_admin_requests', JSON.stringify(list));
-  await navigator.clipboard.writeText(link).catch(()=>{});
-  alert('Local батлагдлаа. Link хууллаа.');
-  render(list);
-};
-
-window.copyLink = async function(link){await navigator.clipboard.writeText(link).catch(()=>{}); alert('Link хууллаа: '+link);};
-window.copySms = async function(link,name,phone){
-  const msg=reportMessage(link,name,phone);
-  await navigator.clipboard.writeText(msg).catch(()=>{});
-  alert('Дугаарт явуулах текст хууллаа. Утас: '+(phone||''));
-};
-window.openSms = function(phoneEnc, linkEnc, nameEnc, mode='sms'){
-  const phone = decodeURIComponent(phoneEnc || '').replace(/[^0-9+]/g,'');
-  const link = decodeURIComponent(linkEnc || '');
-  const name = decodeURIComponent(nameEnc || '');
-  const msg = reportMessage(link, name, phone);
-  if(!phone){
-    alert('Хэрэглэгчийн утасны дугаар алга. Эхлээд текстээ хуулж гараар явуул.');
-    navigator.clipboard.writeText(msg).catch(()=>{});
-    return;
-  }
-  navigator.clipboard.writeText(msg).catch(()=>{});
-  const body = encodeURIComponent(msg);
-  const smsUrl = mode === 'smsto' ? `smsto:${phone}?body=${body}` : `sms:${phone}?body=${body}`;
-  window.location.href = smsUrl;
-};
-
-window.signInAdmin = signInAdmin;
-window.signOutAdmin = signOutAdmin;
-
-window.addEventListener('load',async ()=>{
-  if(isFirebaseReady()){
-    try{
-      await window.EBEJ_AUTH.getRedirectResult();
-    }catch(e){
-      console.error('Redirect login error', e);
-      setStatus('Google нэвтрэхэд алдаа гарлаа. Firebase Authentication → Google асаасан эсэх, Settings → Authorized domains дээр ucihafafa-alt.github.io нэмсэн эсэхээ шалга.');
-    }
-    window.EBEJ_AUTH.onAuthStateChanged(user=>{
-      $('loginState').innerHTML = user ? `Нэвтэрсэн: <b>${esc(user.email)}</b> <button class="btn light smallBtn" onclick="signOutAdmin()">Гарах</button>` : '<button class="btn primary" onclick="signInAdmin()">Google админаар нэвтрэх</button>';
-      loadRequests();
-    });
-  }else{
-    $('loginState').innerHTML = '<b>Firebase config бөглөгдөөгүй байна.</b>';
-    loadRequests();
   }
 });
+
+logoutBtn.addEventListener("click", () => signOut(auth));
+refreshBtn.addEventListener("click", loadData);
+searchInput.addEventListener("input", applyFilters);
+monthFilter.addEventListener("change", applyFilters);
+csvBtn.addEventListener("click", downloadCsv);
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    setLoggedOut();
+    return;
+  }
+  if (!ADMIN_EMAILS.includes(user.email)) {
+    await signOut(auth);
+    alert("Энэ Gmail хаягт админ эрх тохируулаагүй байна: " + user.email);
+    return;
+  }
+  setLoggedIn(user);
+  await loadData();
+});
+
+function setLoggedOut() {
+  dashboard.classList.add("hidden");
+  logoutBtn.classList.add("hidden");
+  loginBtn.classList.remove("hidden");
+  loginNotice.classList.remove("hidden");
+}
+
+function setLoggedIn(user) {
+  dashboard.classList.remove("hidden");
+  logoutBtn.classList.remove("hidden");
+  loginBtn.classList.add("hidden");
+  loginNotice.classList.add("hidden");
+  logoutBtn.textContent = `${user.email} — Гарах`;
+}
+
+async function loadData() {
+  recordsBody.innerHTML = `<tr><td colspan="13">Уншиж байна...</td></tr>`;
+  const q = query(collection(db, COLLECTION_NAME), orderBy("createdAt", "desc"));
+  const snap = await getDocs(q);
+  allRecords = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  applyFilters();
+}
+
+function applyFilters() {
+  const term = searchInput.value.trim().toLowerCase();
+  const month = monthFilter.value;
+  filteredRecords = allRecords.filter((r) => {
+    const date = getDate(r);
+    const monthOk = !month || toMonth(date) === month;
+    const hay = [
+      r.registerNumber,
+      r.fullName,
+      r.residencyStatus,
+      r.bag,
+      r.gender,
+      r.bmiCategory,
+      r.riskLevel,
+      ...(r.advices || [])
+    ].join(" ").toLowerCase();
+    return monthOk && (!term || hay.includes(term));
+  });
+  renderStats(filteredRecords);
+  renderTable(filteredRecords);
+}
+
+function renderStats(records) {
+  const today = new Date();
+  const thisMonth = toMonth(today);
+  const todayStr = toDay(today);
+
+  const stats = [
+    ["Нийт хамрагдсан", records.length],
+    ["Өнөөдөр", records.filter((r) => toDay(getDate(r)) === todayStr).length],
+    ["Энэ сар", records.filter((r) => toMonth(getDate(r)) === thisMonth).length],
+    ["Хэвийн жинтэй", count(records, "bmiCategory", "Хэвийн жин")],
+    ["Илүүдэл жинтэй", count(records, "bmiCategory", "Илүүдэл жин")],
+    ["Таргалалт I зэрэг", count(records, "bmiCategory", "Таргалалт I зэрэг")],
+    ["Таргалалт II зэрэг", count(records, "bmiCategory", "Таргалалт II зэрэг")],
+    ["Таргалалт III зэрэг", count(records, "bmiCategory", "Таргалалт III зэрэг")],
+    ["Зүүнбүрэн сумын иргэн", count(records, "residencyStatus", "Зүүнбүрэн сумын иргэн")],
+    ["Түр оршин суугч", count(records, "residencyStatus", "Түр оршин суугч")],
+    ["Бусад харьяалал", count(records, "residencyStatus", "Бусад сум/аймгийн иргэн")],
+    ["Хөдөлгөөн нэмэх зөвлөмж", countAdvice(records, "хөдөлгөөн")],
+    ["Давс, өөх тос багасгах", countAdvice(records, "Давс")],
+    ["Даралт, сахар хянах", countAdvice(records, "даралт") + countAdvice(records, "сахар")],
+    ["ЭМТ-д хандах", countAdvice(records, "ЭМТ")]
+  ];
+
+  const bagStats = ["1-р баг", "2-р баг", "3-р баг", "4-р баг", "5-р баг", "Бусад"].map((bag) => [bag, count(records, "bag", bag)]);
+  const genderStats = ["Эрэгтэй", "Эмэгтэй"].map((g) => [g, count(records, "gender", g)]);
+  const ageStats = ["0–17", "18–29", "30–44", "45–59", "60+"].map((a) => [a, count(records, "ageGroup", a)]);
+
+  statsGrid.innerHTML = [
+    ...stats.map(statCard),
+    groupCard("Багаар", bagStats),
+    groupCard("Хүйсээр", genderStats),
+    groupCard("Насны бүлгээр", ageStats)
+  ].join("");
+}
+
+function statCard([title, value]) {
+  return `<article class="stat"><span>${escapeHtml(title)}</span><strong>${value}</strong></article>`;
+}
+
+function groupCard(title, items) {
+  const max = Math.max(1, ...items.map(([, v]) => v));
+  return `<article class="stat wide"><span>${escapeHtml(title)}</span>${items.map(([name, value]) => `
+    <div class="bar-row"><em>${escapeHtml(name)}</em><b>${value}</b><i style="width:${Math.round((value / max) * 100)}%"></i></div>
+  `).join("")}</article>`;
+}
+
+function renderTable(records) {
+  tableCount.textContent = `${records.length} бүртгэл`;
+  if (!records.length) {
+    recordsBody.innerHTML = `<tr><td colspan="13">Бүртгэл олдсонгүй.</td></tr>`;
+    return;
+  }
+  recordsBody.innerHTML = records.map((r) => `
+    <tr>
+      <td>${formatDate(getDate(r))}</td>
+      <td>${escapeHtml(r.registerNumber || "")}</td>
+      <td>${escapeHtml(r.fullName || "")}</td>
+      <td>${escapeHtml(r.residencyStatus || "")}</td>
+      <td>${escapeHtml(r.bag || "")}</td>
+      <td>${escapeHtml(r.age || "")}</td>
+      <td>${escapeHtml(r.gender || "")}</td>
+      <td>${escapeHtml(r.height || "")}</td>
+      <td>${escapeHtml(r.weight || "")}</td>
+      <td><b>${escapeHtml(r.bmi || "")}</b></td>
+      <td>${escapeHtml(r.bmiCategory || "")}</td>
+      <td>${escapeHtml(r.riskScore ?? "")}</td>
+      <td>${escapeHtml((r.advices || []).join("; "))}</td>
+    </tr>
+  `).join("");
+}
+
+function downloadCsv() {
+  const headers = ["Огноо", "РД", "Овог нэр", "Харьяалал", "Баг", "Нас", "Насны бүлэг", "Хүйс", "Өндөр", "Жин", "BMI", "BMI ангилал", "Эрсдэлийн оноо", "Эрсдэлийн түвшин", "Халдварт өвчний төлөв", "Зөвлөмж"];
+  const rows = filteredRecords.map((r) => [
+    formatDate(getDate(r)),
+    r.registerNumber,
+    r.fullName,
+    r.residencyStatus,
+    r.bag,
+    r.age,
+    r.ageGroup,
+    r.gender,
+    r.height,
+    r.weight,
+    r.bmi,
+    r.bmiCategory,
+    r.riskScore,
+    r.riskLevel,
+    r.infectionRisk,
+    (r.advices || []).join("; ")
+  ]);
+  const csv = [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
+  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `zuunburen-emt-tailan-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function count(records, key, value) {
+  return records.filter((r) => r[key] === value).length;
+}
+
+function countAdvice(records, keyword) {
+  const k = keyword.toLowerCase();
+  return records.filter((r) => (r.advices || []).some((a) => String(a).toLowerCase().includes(k))).length;
+}
+
+function getDate(record) {
+  if (record.createdAt?.toDate) return record.createdAt.toDate();
+  if (record.localDate) return new Date(record.localDate);
+  return new Date();
+}
+
+function toMonth(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function toDay(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function formatDate(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+
+function csvCell(value) {
+  return `"${String(value ?? "").replaceAll('"', '""')}"`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
