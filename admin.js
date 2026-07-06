@@ -1,261 +1,123 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signInWithRedirect,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { firebaseConfig, ADMIN_EMAILS, COLLECTION_NAME } from "./firebase-config.js";
+import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { firebaseConfig, COLLECTION_NAME, ADMIN_PIN } from "./firebase-config.js";
 
 const $ = (id) => document.getElementById(id);
-const loginBtn = $("loginBtn");
-const logoutBtn = $("logoutBtn");
-const dashboard = $("dashboard");
-const loginNotice = $("loginNotice");
-const statsGrid = $("statsGrid");
-const recordsBody = $("recordsBody");
-const tableCount = $("tableCount");
-const searchInput = $("searchInput");
-const monthFilter = $("monthFilter");
-const csvBtn = $("csvBtn");
-const refreshBtn = $("refreshBtn");
+$("year").textContent = new Date().getFullYear();
 
-let auth, db;
-let allRecords = [];
-let filteredRecords = [];
+let db = null, rows = [], filteredRows = [];
+try { db = getFirestore(initializeApp(firebaseConfig)); } catch(e) { console.error(e); }
 
-try {
-  const app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getFirestore(app);
-} catch (error) {
-  loginNotice.textContent = "Firebase тохиргоо ороогүй байна. firebase-config.js файлыг бөглөнө үү.";
-  console.error(error);
-}
+if (sessionStorage.getItem("zuunburen_admin_ok") === "1") openDashboard();
 
-loginBtn.addEventListener("click", async () => {
-  try {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-  } catch (error) {
-    if (String(error?.code).includes("popup")) {
-      await signInWithRedirect(auth, new GoogleAuthProvider());
-    } else {
-      alert("Нэвтрэх үед алдаа гарлаа: " + (error.message || error));
-    }
+$("adminLoginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if ($("adminPin").value.trim() !== ADMIN_PIN) {
+    $("loginMessage").textContent = "Админ нууц код буруу байна.";
+    $("loginMessage").className = "message error";
+    return;
   }
+  sessionStorage.setItem("zuunburen_admin_ok", "1");
+  await openDashboard();
 });
 
-logoutBtn.addEventListener("click", () => signOut(auth));
-refreshBtn.addEventListener("click", loadData);
-searchInput.addEventListener("input", applyFilters);
-monthFilter.addEventListener("change", applyFilters);
-csvBtn.addEventListener("click", downloadCsv);
+$("refreshBtn").addEventListener("click", loadData);
+$("csvBtn").addEventListener("click", downloadCsv);
+$("searchInput").addEventListener("input", applyFilters);
+$("bagFilter").addEventListener("change", applyFilters);
+$("bmiFilter").addEventListener("change", applyFilters);
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    setLoggedOut();
-    return;
-  }
-  if (!ADMIN_EMAILS.includes(user.email)) {
-    await signOut(auth);
-    alert("Энэ Gmail хаягт админ эрх тохируулаагүй байна: " + user.email);
-    return;
-  }
-  setLoggedIn(user);
+async function openDashboard() {
+  $("loginCard").classList.add("hidden");
+  $("dashboard").classList.remove("hidden");
   await loadData();
-});
-
-function setLoggedOut() {
-  dashboard.classList.add("hidden");
-  logoutBtn.classList.add("hidden");
-  loginBtn.classList.remove("hidden");
-  loginNotice.classList.remove("hidden");
-}
-
-function setLoggedIn(user) {
-  dashboard.classList.remove("hidden");
-  logoutBtn.classList.remove("hidden");
-  loginBtn.classList.add("hidden");
-  loginNotice.classList.add("hidden");
-  logoutBtn.textContent = `${user.email} — Гарах`;
 }
 
 async function loadData() {
-  recordsBody.innerHTML = `<tr><td colspan="13">Уншиж байна...</td></tr>`;
-  const q = query(collection(db, COLLECTION_NAME), orderBy("createdAt", "desc"));
-  const snap = await getDocs(q);
-  allRecords = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-  applyFilters();
+  if (!db) return renderEmpty("Firebase тохиргоо буруу байна.");
+  $("tableBody").innerHTML = `<tr><td colspan="13">Уншиж байна...</td></tr>`;
+  try {
+    const q = query(collection(db, COLLECTION_NAME), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    applyFilters();
+  } catch (e) {
+    console.error(e);
+    renderEmpty("Мэдээлэл уншихад алдаа гарлаа. Firestore Rules дээр read эрхээ шалгана уу.");
+  }
 }
 
 function applyFilters() {
-  const term = searchInput.value.trim().toLowerCase();
-  const month = monthFilter.value;
-  filteredRecords = allRecords.filter((r) => {
-    const date = getDate(r);
-    const monthOk = !month || toMonth(date) === month;
-    const hay = [
-      r.registerNumber,
-      r.fullName,
-      r.residencyStatus,
-      r.bag,
-      r.gender,
-      r.bmiCategory,
-      r.riskLevel,
-      ...(r.advices || [])
-    ].join(" ").toLowerCase();
-    return monthOk && (!term || hay.includes(term));
+  const search = $("searchInput").value.trim().toLowerCase();
+  const bag = $("bagFilter").value;
+  const bmi = $("bmiFilter").value;
+  filteredRows = rows.filter(r => {
+    const text = [r.registerNumber, r.fullName, r.residencyStatus, r.bag, r.age, r.gender, r.bmiCategory, r.riskLevel, (r.advices || []).join(" ")].join(" ").toLowerCase();
+    return (!search || text.includes(search)) && (!bag || r.bag === bag) && (!bmi || r.bmiCategory === bmi);
   });
-  renderStats(filteredRecords);
-  renderTable(filteredRecords);
+  renderStats(filteredRows);
+  renderTable(filteredRows);
 }
 
-function renderStats(records) {
-  const today = new Date();
-  const thisMonth = toMonth(today);
-  const todayStr = toDay(today);
-
+function renderStats(data) {
+  const today = new Date().toISOString().slice(0,10);
+  const month = new Date().toISOString().slice(0,7);
+  const count = fn => data.filter(fn).length;
+  const advice = word => data.filter(r => (r.advices || []).join(" ").includes(word)).length;
   const stats = [
-    ["Нийт хамрагдсан", records.length],
-    ["Өнөөдөр", records.filter((r) => toDay(getDate(r)) === todayStr).length],
-    ["Энэ сар", records.filter((r) => toMonth(getDate(r)) === thisMonth).length],
-    ["Хэвийн жинтэй", count(records, "bmiCategory", "Хэвийн жин")],
-    ["Илүүдэл жинтэй", count(records, "bmiCategory", "Илүүдэл жин")],
-    ["Таргалалт I зэрэг", count(records, "bmiCategory", "Таргалалт I зэрэг")],
-    ["Таргалалт II зэрэг", count(records, "bmiCategory", "Таргалалт II зэрэг")],
-    ["Таргалалт III зэрэг", count(records, "bmiCategory", "Таргалалт III зэрэг")],
-    ["Зүүнбүрэн сумын иргэн", count(records, "residencyStatus", "Зүүнбүрэн сумын иргэн")],
-    ["Түр оршин суугч", count(records, "residencyStatus", "Түр оршин суугч")],
-    ["Бусад харьяалал", count(records, "residencyStatus", "Бусад сум/аймгийн иргэн")],
-    ["Хөдөлгөөн нэмэх зөвлөмж", countAdvice(records, "хөдөлгөөн")],
-    ["Давс, өөх тос багасгах", countAdvice(records, "Давс")],
-    ["Даралт, сахар хянах", countAdvice(records, "даралт") + countAdvice(records, "сахар")],
-    ["ЭМТ-д хандах", countAdvice(records, "ЭМТ")]
+    ["Нийт хамрагдсан", data.length],
+    ["Өнөөдөр", count(r => getDate(r).startsWith(today))],
+    ["Энэ сар", count(r => getDate(r).startsWith(month))],
+    ["Зүүнбүрэн сумын иргэн", count(r => r.residencyStatus === "Зүүнбүрэн сумын иргэн")],
+    ["Жингийн дутагдал", count(r => r.bmiCategory === "Жингийн дутагдал")],
+    ["Хэвийн жин", count(r => r.bmiCategory === "Хэвийн жин")],
+    ["Илүүдэл жин", count(r => r.bmiCategory === "Илүүдэл жин")],
+    ["Таргалалт I зэрэг", count(r => r.bmiCategory === "Таргалалт I зэрэг")],
+    ["Таргалалт II зэрэг", count(r => r.bmiCategory === "Таргалалт II зэрэг")],
+    ["Таргалалт III зэрэг", count(r => r.bmiCategory === "Таргалалт III зэрэг")],
+    ["Хөдөлгөөн нэмэх зөвлөмж", advice("Хөдөлгөөний зөвлөмж")],
+    ["Даралт/сахар хянах", advice("Даралт") + advice("Сахар")]
   ];
-
-  const bagStats = ["1-р баг", "2-р баг", "3-р баг", "4-р баг", "5-р баг", "Бусад"].map((bag) => [bag, count(records, "bag", bag)]);
-  const genderStats = ["Эрэгтэй", "Эмэгтэй"].map((g) => [g, count(records, "gender", g)]);
-  const ageStats = ["0–17", "18–29", "30–44", "45–59", "60+"].map((a) => [a, count(records, "ageGroup", a)]);
-
-  statsGrid.innerHTML = [
-    ...stats.map(statCard),
-    groupCard("Багаар", bagStats),
-    groupCard("Хүйсээр", genderStats),
-    groupCard("Насны бүлгээр", ageStats)
-  ].join("");
+  $("statsGrid").innerHTML = stats.map(([a,b]) => `<article class="stat"><span>${esc(a)}</span><strong>${b}</strong></article>`).join("");
 }
 
-function statCard([title, value]) {
-  return `<article class="stat"><span>${escapeHtml(title)}</span><strong>${value}</strong></article>`;
-}
-
-function groupCard(title, items) {
-  const max = Math.max(1, ...items.map(([, v]) => v));
-  return `<article class="stat wide"><span>${escapeHtml(title)}</span>${items.map(([name, value]) => `
-    <div class="bar-row"><em>${escapeHtml(name)}</em><b>${value}</b><i style="width:${Math.round((value / max) * 100)}%"></i></div>
-  `).join("")}</article>`;
-}
-
-function renderTable(records) {
-  tableCount.textContent = `${records.length} бүртгэл`;
-  if (!records.length) {
-    recordsBody.innerHTML = `<tr><td colspan="13">Бүртгэл олдсонгүй.</td></tr>`;
-    return;
-  }
-  recordsBody.innerHTML = records.map((r) => `
+function renderTable(data) {
+  $("rowCount").textContent = `${data.length} мөр`;
+  if (!data.length) return $("tableBody").innerHTML = `<tr><td colspan="13">Мэдээлэл олдсонгүй.</td></tr>`;
+  $("tableBody").innerHTML = data.map(r => `
     <tr>
-      <td>${formatDate(getDate(r))}</td>
-      <td>${escapeHtml(r.registerNumber || "")}</td>
-      <td>${escapeHtml(r.fullName || "")}</td>
-      <td>${escapeHtml(r.residencyStatus || "")}</td>
-      <td>${escapeHtml(r.bag || "")}</td>
-      <td>${escapeHtml(r.age || "")}</td>
-      <td>${escapeHtml(r.gender || "")}</td>
-      <td>${escapeHtml(r.height || "")}</td>
-      <td>${escapeHtml(r.weight || "")}</td>
-      <td><b>${escapeHtml(r.bmi || "")}</b></td>
-      <td>${escapeHtml(r.bmiCategory || "")}</td>
-      <td>${escapeHtml(r.riskScore ?? "")}</td>
-      <td>${escapeHtml((r.advices || []).join("; "))}</td>
-    </tr>
-  `).join("");
+      <td>${esc(formatDate(getDate(r)))}</td><td>${esc(r.registerNumber)}</td><td>${esc(r.fullName)}</td>
+      <td>${esc(r.residencyStatus)}</td><td>${esc(r.bag)}</td><td>${esc(r.age)}</td><td>${esc(r.gender)}</td>
+      <td>${esc(r.height)}</td><td>${esc(r.weight)}</td><td>${esc(r.bmi)}</td><td>${esc(r.bmiCategory)}</td>
+      <td>${esc(r.riskLevel)} (${esc(r.riskScore ?? "")})</td>
+      <td>${esc((r.advices || []).join(" | "))}</td>
+    </tr>`).join("");
+}
+
+function renderEmpty(text) {
+  $("statsGrid").innerHTML = "";
+  $("tableBody").innerHTML = `<tr><td colspan="13">${esc(text)}</td></tr>`;
+  $("rowCount").textContent = "0 мөр";
 }
 
 function downloadCsv() {
-  const headers = ["Огноо", "РД", "Овог нэр", "Харьяалал", "Баг", "Нас", "Насны бүлэг", "Хүйс", "Өндөр", "Жин", "BMI", "BMI ангилал", "Эрсдэлийн оноо", "Эрсдэлийн түвшин", "Халдварт өвчний төлөв", "Зөвлөмж"];
-  const rows = filteredRecords.map((r) => [
-    formatDate(getDate(r)),
-    r.registerNumber,
-    r.fullName,
-    r.residencyStatus,
-    r.bag,
-    r.age,
-    r.ageGroup,
-    r.gender,
-    r.height,
-    r.weight,
-    r.bmi,
-    r.bmiCategory,
-    r.riskScore,
-    r.riskLevel,
-    r.infectionRisk,
-    (r.advices || []).join("; ")
-  ]);
-  const csv = [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
-  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+  const headers = ["Огноо","РД","Овог нэр","Харьяалал","Баг","Нас","Хүйс","Өндөр","Жин","BMI","Ангилал","Эрсдэлийн түвшин","Эрсдэлийн оноо","Зөвлөмж"];
+  const lines = [headers.join(",")];
+  for (const r of filteredRows) {
+    lines.push([formatDate(getDate(r)), r.registerNumber, r.fullName, r.residencyStatus, r.bag, r.age, r.gender, r.height, r.weight, r.bmi, r.bmiCategory, r.riskLevel, r.riskScore, (r.advices || []).join(" | ")].map(csv).join(","));
+  }
+  const blob = new Blob(["\ufeff" + lines.join("\n")], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `zuunburen-emt-tailan-${new Date().toISOString().slice(0, 10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(a.href);
+  a.href = url; a.download = `zuunburen-emt-tailan-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 }
 
-function count(records, key, value) {
-  return records.filter((r) => r[key] === value).length;
+function getDate(r) {
+  if (r.localDate) return String(r.localDate);
+  if (r.createdAt?.toDate) return r.createdAt.toDate().toISOString();
+  return "";
 }
-
-function countAdvice(records, keyword) {
-  const k = keyword.toLowerCase();
-  return records.filter((r) => (r.advices || []).some((a) => String(a).toLowerCase().includes(k))).length;
-}
-
-function getDate(record) {
-  if (record.createdAt?.toDate) return record.createdAt.toDate();
-  if (record.localDate) return new Date(record.localDate);
-  return new Date();
-}
-
-function toMonth(date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-}
-
-function toDay(date) {
-  return date.toISOString().slice(0, 10);
-}
-
-function formatDate(date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
-}
-
-function csvCell(value) {
-  return `"${String(value ?? "").replaceAll('"', '""')}"`;
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+function formatDate(v) { try { const d = new Date(v); return Number.isNaN(d.getTime()) ? v : d.toLocaleString("mn-MN"); } catch { return v || ""; } }
+function csv(v) { return `"${String(v ?? "").replaceAll('"','""')}"`; }
+function esc(v) { return String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }

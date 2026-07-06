@@ -17,3 +17,5 @@ export const ADMIN_EMAILS = [
 ];
 
 export const COLLECTION_NAME = "bmi_submissions";
+
+export const ADMIN_PIN = "2026";

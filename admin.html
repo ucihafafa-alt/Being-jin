@@ -3,84 +3,73 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#087f8c" />
   <title>Админ тайлан — Зүүнбүрэн сумын ЭМТ</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=bg1" />
 </head>
-<body class="admin-page">
-  <header class="admin-top">
+<body>
+  <header class="admin-hero">
     <div class="wrap admin-head">
-      <div>
-        <p class="eyebrow">Админ хэсэг</p>
-        <h1>Зүүнбүрэн сумын ЭМТ — Тайлан</h1>
-        <p>Хамрагдсан иргэд, BMI ангилал, эрсдэлийн зөвлөмжийн нэгтгэл.</p>
+      <div class="admin-title-row">
+        <img class="admin-logo" src="logo.jpg?v=bg1" alt="Лого" />
+        <div>
+          <p class="eyebrow">Админ тайлан хянах хэсэг</p>
+          <h1>Зүүнбүрэн сумын<br>Эрүүл мэндийн төв</h1>
+          <p>Иргэдийн BMI, эрсдэлийн асуумж, зөвлөмжийн нэгтгэл тайлан.</p>
+        </div>
       </div>
-      <div class="admin-actions">
-        <a class="btn ghost" href="index.html">Нүүр хуудас</a>
-        <button class="btn primary" id="loginBtn" type="button">Google-р нэвтрэх</button>
-        <button class="btn ghost hidden" id="logoutBtn" type="button">Гарах</button>
-      </div>
+      <a class="btn ghost" href="./index.html?v=bg1">Нүүр хуудас</a>
     </div>
   </header>
 
   <main class="wrap main">
-    <section id="loginNotice" class="notice">
-      Админ тайлан харахын тулд Firebase Authentication дээр зөвшөөрөгдсөн Gmail хаягаар нэвтэрнэ.
+    <section id="loginCard" class="card form-card admin-login">
+      <div class="section-title">
+        <p class="eyebrow dark">Нэвтрэх</p>
+        <h2>Админ эрхээр орох</h2>
+        <p>Энэ хэсэг зөвхөн тайлан хянах ажилтанд зориулагдсан.</p>
+      </div>
+      <form id="adminLoginForm">
+        <label>
+          <span>Админ нууц код <b>*</b></span>
+          <input id="adminPin" type="password" inputmode="numeric" placeholder="Нууц код" required />
+        </label>
+        <div class="form-actions">
+          <button class="btn primary big" type="submit">Тайлан руу орох</button>
+        </div>
+        <p id="loginMessage" class="message"></p>
+      </form>
     </section>
 
     <section id="dashboard" class="hidden">
-      <div class="toolbar card">
-        <div>
-          <p class="eyebrow dark">Тайлангийн шүүлтүүр</p>
-          <h2>Нэгтгэл харах</h2>
-        </div>
-        <label>
-          <span>Сараар шүүх</span>
-          <input id="monthFilter" type="month" />
-        </label>
-        <label>
-          <span>Хайлт</span>
-          <input id="searchInput" type="search" placeholder="РД, нэр, баг, ангилал..." />
-        </label>
-        <button class="btn primary" id="refreshBtn" type="button">Шинэчлэх</button>
+      <section class="card toolbar">
+        <label><span>Хайх</span><input id="searchInput" type="search" placeholder="РД, овог нэр, баг, ангиллаар хайх" /></label>
+        <label><span>Баг</span><select id="bagFilter"><option value="">Бүгд</option><option>1-р баг</option><option>2-р баг</option><option>3-р баг</option><option>4-р баг</option><option>5-р баг</option><option>Бусад</option></select></label>
+        <label><span>BMI ангилал</span><select id="bmiFilter"><option value="">Бүгд</option><option>Жингийн дутагдал</option><option>Хэвийн жин</option><option>Илүүдэл жин</option><option>Таргалалт I зэрэг</option><option>Таргалалт II зэрэг</option><option>Таргалалт III зэрэг</option></select></label>
+        <button class="btn primary big" id="refreshBtn" type="button">Шинэчлэх</button>
         <button class="btn ghost dark" id="csvBtn" type="button">CSV татах</button>
-      </div>
+      </section>
 
-      <section id="statsGrid" class="stats-grid"></section>
+      <section class="stats-grid" id="statsGrid"></section>
 
-      <section class="card">
+      <section class="card report-card">
         <div class="section-title">
-          <p class="eyebrow dark">Дэлгэрэнгүй</p>
-          <h2>Иргэн бүрийн бүртгэл</h2>
-          <p id="tableCount">0 бүртгэл</p>
+          <p class="eyebrow dark">Тайлангийн дэлгэрэнгүй</p>
+          <h2>Хамрагдсан иргэдийн жагсаалт</h2>
+          <p id="rowCount">0 мөр</p>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
-              <tr>
-                <th>Огноо</th>
-                <th>РД</th>
-                <th>Овог нэр</th>
-                <th>Харьяалал</th>
-                <th>Баг</th>
-                <th>Нас</th>
-                <th>Хүйс</th>
-                <th>Өндөр</th>
-                <th>Жин</th>
-                <th>BMI</th>
-                <th>Ангилал</th>
-                <th>Эрсдэл</th>
-                <th>Зөвлөмж</th>
-              </tr>
+              <tr><th>Огноо</th><th>РД</th><th>Овог нэр</th><th>Харьяалал</th><th>Баг</th><th>Нас</th><th>Хүйс</th><th>Өндөр</th><th>Жин</th><th>BMI</th><th>Ангилал</th><th>Эрсдэл</th><th>Зөвлөмж</th></tr>
             </thead>
-            <tbody id="recordsBody"></tbody>
+            <tbody id="tableBody"></tbody>
           </table>
         </div>
       </section>
     </section>
   </main>
 
-  <script type="module" src="admin.js"></script>
+  <footer><div class="wrap footer-grid"><div><p>© <span id="year"></span> Зүүнбүрэн сумын Эрүүл мэндийн төв</p><small class="credits">Зохиогч, хөгжүүлэгч: L.BATTSOG.</small></div></div></footer>
+  <script type="module" src="admin.js?v=bg1"></script>
 </body>
 </html>

@@ -1,14 +1,12 @@
-const CACHE = 'zuunburen-emt-v1';
-const ASSETS = ['./', './index.html', './admin.html', './style.css', './app.js', './admin.js', './firebase-config.js', './manifest.json', './favicon.svg'];
-self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
+self.addEventListener("install", (event) => {
   self.skipWaiting();
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))));
 });
-self.addEventListener('activate', (event) => {
-  event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))));
-  self.clients.claim();
+self.addEventListener("activate", (event) => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
 });
-self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
-  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
-});
+self.addEventListener("fetch", () => {});

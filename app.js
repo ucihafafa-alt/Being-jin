@@ -27,10 +27,17 @@ try {
 
 $("year").textContent = new Date().getFullYear();
 
+// Old service-worker caches can keep showing the previous version on GitHub Pages.
+// This page clears old caches and unregisters old workers.
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
-  });
+  navigator.serviceWorker.getRegistrations()
+    .then((regs) => Promise.all(regs.map((reg) => reg.unregister())))
+    .catch(() => {});
+}
+if ("caches" in window) {
+  caches.keys()
+    .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+    .catch(() => {});
 }
 
 form.addEventListener("submit", async (event) => {

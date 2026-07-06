@@ -1,9 +1,9 @@
 {
-  "name": "Зүүнбүрэн сумын Эрүүл мэндийн төв",
+  "name": "Зүүнбүрэн сумын ЭМТ",
   "short_name": "Зүүнбүрэн ЭМТ",
-  "start_url": "./index.html",
+  "start_url": "./index.html?v=bg1",
   "display": "standalone",
   "background_color": "#f2fbfb",
   "theme_color": "#087f8c",
-  "lang": "mn"
+  "icons": []
 }

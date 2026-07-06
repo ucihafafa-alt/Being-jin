@@ -1,33 +1,9 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isAdmin() {
-      return request.auth != null && request.auth.token.email in [
-        "ucihafafa@gmail.com"
-      ];
-    }
-
-    function validSubmission() {
-      return request.resource.data.keys().hasOnly([
-        'createdAt', 'localDate', 'registerNumber', 'fullName', 'age', 'ageGroup', 'gender',
-        'residencyStatus', 'bag', 'height', 'weight', 'bmi', 'bmiCategory', 'riskScore',
-        'riskLevel', 'infectionRisk', 'answers', 'advices', 'purpose'
-      ])
-      && request.resource.data.registerNumber is string
-      && request.resource.data.fullName is string
-      && request.resource.data.age is number
-      && request.resource.data.height is number
-      && request.resource.data.weight is number
-      && request.resource.data.bmi is number
-      && request.resource.data.advices is list;
-    }
-
-    match /bmi_submissions/{submissionId} {
-      // Иргэн зөвхөн шинээр бүртгэл үүсгэнэ. Давхар РД бол ижил hash ID үүсэх тул update болж, хориглогдоно.
-      allow create: if !exists(/databases/$(database)/documents/bmi_submissions/$(submissionId)) && validSubmission();
-
-      // Админ Gmail-ээр нэвтэрсэн хэрэглэгч л унших, засах, устгах эрхтэй.
-      allow read, update, delete: if isAdmin();
+    match /bmi_submissions/{docId} {
+      allow create: if true;
+      allow read, update, delete: if false;
     }
   }
 }

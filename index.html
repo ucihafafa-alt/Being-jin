@@ -6,14 +6,14 @@
   <meta name="theme-color" content="#087f8c" />
   <title>Зүүнбүрэн сумын Эрүүл мэндийн төв</title>
   <meta name="description" content="Зүүнбүрэн сумын иргэдэд зориулсан BMI тооцоолол, халдварт болон халдварт бус өвчлөлийн эрсдэлээс урьдчилан сэргийлэх зөвлөмжийн цахим хуудас." />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json?v=bg1" />
+  <link rel="icon" href="favicon.svg?v=bg1" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css?v=bg1" />
 </head>
 <body>
   <header class="hero">
     <div class="wrap hero-grid">
-      <div>
+      <div class="hero-copy">
         <p class="eyebrow">Үнэ төлбөргүй цахим зөвлөмж</p>
         <h1>Зүүнбүрэн сумын<br>Эрүүл мэндийн төв</h1>
         <p class="lead">Зүүнбүрэн сумын иргэд өөрийн биеийн жингийн индексээ мэдэж авч, халдварт болон халдварт бус өвчлөлийн эрсдэлт хүчин зүйлсийн талаар дэлгэрэнгүй асуумж бөглөн урьдчилан сэргийлэх зөвлөмж авах цахим хуудас.</p>
@@ -23,9 +23,9 @@
         </div>
       </div>
       <div class="hero-card" aria-label="Эрүүл мэндийн төвийн мэдээлэл">
-        <img class="hero-logo" src="logo.jpg" alt="Зүүнбүрэн сумын эрүүл мэндийн төвийн лого" />
+        <img class="hero-logo" src="logo.jpg?v=bg1" alt="Зүүнбүрэн сумын эрүүл мэндийн төвийн лого" />
         <h2>Иргэдэд зориулсан цахим үйлчилгээ</h2>
-        <p>Нэг хуудас дээр иргэний бүртгэл, BMI тооцоолол, халдвар ба халдварт бус өвчлөлийн эрсдэлийн асуумж болон дэлгэрэнгүй зөвлөмжийг харуулна.</p>
+        <p>Иргэний бүртгэл, BMI тооцоолол, халдварт болон халдварт бус өвчлөлийн эрсдэлийн асуумж, дэлгэрэнгүй зөвлөмжийг нэг дор харуулна.</p>
         <ul>
           <li>РД, овог нэр, харьяалал, багийн мэдээлэл</li>
           <li>Халдварт бус өвчлөлийн нөлөөлөх хүчин зүйлсийн дэлгэрэнгүй асуумж</li>
@@ -110,63 +110,63 @@
         <div class="questions">
           <fieldset>
             <legend>1. Та долоо хоногт 5 өдөр, өдөр бүр 30 минутаас багагүй хөдөлгөөн хийдэг үү?</legend>
-            <label class="radio"><input type="radio" name="activity" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="activity" value="no" /> Үгүй</label>
+            <label class="option"><input type="radio" name="activity" value="yes" required /> Тийм</label>
+            <label class="option"><input type="radio" name="activity" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
-            <legend>2. Та өдөр бүр 5 ба түүнээс дээш нэгж жимс, хүнсний ногоо хэрэглэдэг үү?</legend>
-            <label class="radio"><input type="radio" name="fruitVeg" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="fruitVeg" value="no" /> Үгүй</label>
+            <legend>2. Та өдөр бүр жимс, хүнсний ногоо хангалттай хэрэглэдэг үү?</legend>
+            <label class="option"><input type="radio" name="fruitVeg" value="yes" required /> Тийм</label>
+            <label class="option"><input type="radio" name="fruitVeg" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
-            <legend>3. Та давс, өөх тос, шарсан болон чихэрлэг хүнсийг долоо хоногт 3-аас дээш удаа хэрэглэдэг үү?</legend>
-            <label class="radio"><input type="radio" name="diet" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="diet" value="no" /> Үгүй</label>
+            <legend>3. Та давс, өөх тос, шарсан болон чихэрлэг хүнсийг тогтмол хэрэглэдэг үү?</legend>
+            <label class="option"><input type="radio" name="diet" value="yes" required /> Тийм</label>
+            <label class="option"><input type="radio" name="diet" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
             <legend>4. Та чихэртэй ундаа, хийжүүлсэн ундаа тогтмол хэрэглэдэг үү?</legend>
-            <label class="radio"><input type="radio" name="sugaryDrink" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="sugaryDrink" value="no" /> Үгүй</label>
+            <label class="option"><input type="radio" name="sugaryDrink" value="yes" required /> Тийм</label>
+            <label class="option"><input type="radio" name="sugaryDrink" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
             <legend>5. Та тамхи татдаг уу?</legend>
-            <label class="radio"><input type="radio" name="smoking" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="smoking" value="no" /> Үгүй</label>
+            <label class="option"><input type="radio" name="smoking" value="yes" required /> Тийм</label>
+            <label class="option"><input type="radio" name="smoking" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
             <legend>6. Та архи, согтууруулах ундаа хэрэглэдэг үү?</legend>
-            <label class="radio"><input type="radio" name="alcohol" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="alcohol" value="no" /> Үгүй</label>
+            <label class="option"><input type="radio" name="alcohol" value="yes" required /> Тийм</label>
+            <label class="option"><input type="radio" name="alcohol" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
             <legend>7. Танд даралт ихсэх, толгой өвдөх, зүрх дэлсэх зэрэг зовиур байдаг уу?</legend>
-            <label class="radio"><input type="radio" name="bloodPressure" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="bloodPressure" value="no" /> Үгүй</label>
+            <label class="option"><input type="radio" name="bloodPressure" value="yes" required /> Тийм</label>
+            <label class="option"><input type="radio" name="bloodPressure" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
             <legend>8. Цусны сахар ихсэж байсан, эсвэл шөнө ойрхон шээх, их цангах зэрэг шинж илэрдэг үү?</legend>
-            <label class="radio"><input type="radio" name="glucoseRisk" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="glucoseRisk" value="no" /> Үгүй</label>
+            <label class="option"><input type="radio" name="glucoseRisk" value="yes" required /> Тийм</label>
+            <label class="option"><input type="radio" name="glucoseRisk" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
             <legend>9. Та өдөрт 7 цагаас бага унтаж, эсвэл байнгын стресс, ядаргаа мэдэрдэг үү?</legend>
-            <label class="radio"><input type="radio" name="stressSleep" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="stressSleep" value="no" /> Үгүй</label>
+            <label class="option"><input type="radio" name="stressSleep" value="yes" required /> Тийм</label>
+            <label class="option"><input type="radio" name="stressSleep" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
             <legend>10. Гэр бүлд даралт ихсэх, чихрийн шижин, зүрх судасны өвчний түүх бий юу?</legend>
-            <label class="radio"><input type="radio" name="familyHistory" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="familyHistory" value="no" /> Үгүй</label>
+            <label class="option"><input type="radio" name="familyHistory" value="yes" required /> Тийм</label>
+            <label class="option"><input type="radio" name="familyHistory" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
             <legend>11. Та сүүлийн 1 жилд урьдчилан сэргийлэх үзлэгт хамрагдсан уу?</legend>
-            <label class="radio"><input type="radio" name="screening" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="screening" value="no" /> Үгүй</label>
+            <label class="option"><input type="radio" name="screening" value="yes" required /> Тийм</label>
+            <label class="option"><input type="radio" name="screening" value="no" /> Үгүй</label>
           </fieldset>
           <fieldset>
             <legend>12. Одоогоор халуурах, ханиалгах, хоолой өвдөх, хамар битүүрэх зэрэг шинж тэмдэг байна уу?</legend>
-            <label class="radio"><input type="radio" name="infectionSymptoms" value="yes" required /> Тийм</label>
-            <label class="radio"><input type="radio" name="infectionSymptoms" value="no" /> Үгүй</label>
+            <label class="option"><input type="radio" name="infectionSymptoms" value="yes" required /> Тийм</label>
+            <label class="option"><input type="radio" name="infectionSymptoms" value="no" /> Үгүй</label>
           </fieldset>
         </div>
 
@@ -219,6 +219,8 @@
     </div>
   </footer>
 
-  <script type="module" src="app.js"></script>
+  <script type="module" src="app.js?v=bg1"></script>
+
+<!-- final-fixed-no-admin-one-tap -->
 </body>
 </html>
