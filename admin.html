@@ -4,20 +4,20 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Админ тайлан — Зүүнбүрэн сумын ЭМТ</title>
-  <link rel="stylesheet" href="style.css?v=bg1" />
+  <link rel="stylesheet" href="style.css?v=pro2" />
 </head>
 <body>
   <header class="admin-hero">
     <div class="wrap admin-head">
       <div class="admin-title-row">
-        <img class="admin-logo" src="logo.jpg?v=bg1" alt="Лого" />
+        <img class="admin-logo" src="logo.jpg?v=pro2" alt="Лого" />
         <div>
           <p class="eyebrow">Админ тайлан хянах хэсэг</p>
           <h1>Зүүнбүрэн сумын<br>Эрүүл мэндийн төв</h1>
           <p>Иргэдийн BMI, эрсдэлийн асуумж, зөвлөмжийн нэгтгэл тайлан.</p>
         </div>
       </div>
-      <a class="btn ghost" href="./index.html?v=bg1">Нүүр хуудас</a>
+      <a class="btn ghost" href="./index.html?v=pro2">Нүүр хуудас</a>
     </div>
   </header>
 
@@ -45,11 +45,21 @@
         <label><span>Хайх</span><input id="searchInput" type="search" placeholder="РД, овог нэр, баг, ангиллаар хайх" /></label>
         <label><span>Баг</span><select id="bagFilter"><option value="">Бүгд</option><option>1-р баг</option><option>2-р баг</option><option>3-р баг</option><option>4-р баг</option><option>5-р баг</option><option>Бусад</option></select></label>
         <label><span>BMI ангилал</span><select id="bmiFilter"><option value="">Бүгд</option><option>Жингийн дутагдал</option><option>Хэвийн жин</option><option>Илүүдэл жин</option><option>Таргалалт I зэрэг</option><option>Таргалалт II зэрэг</option><option>Таргалалт III зэрэг</option></select></label>
+        <label><span>Тусгай шүүлтүүр</span><select id="riskFilter"><option value="">Бүгд</option><option value="high">Өндөр эрсдэлтэй</option><option value="obesity23">Таргалалт II, III зэрэг</option><option value="bp">Даралт ихсэх зовиуртай</option><option value="glucose">Сахарын эрсдэлтэй</option><option value="infection">Халдварт өвчний шинжтэй</option></select></label>
         <button class="btn primary big" id="refreshBtn" type="button">Шинэчлэх</button>
         <button class="btn ghost dark" id="csvBtn" type="button">CSV татах</button>
+        <button class="btn ghost dark" id="printReportBtn" type="button">Нэгтгэл хэвлэх</button>
       </section>
 
       <section class="stats-grid" id="statsGrid"></section>
+
+      <section class="card report-card print-summary-card">
+        <div class="section-title">
+          <p class="eyebrow dark">Баг тус бүрийн нэгтгэл</p>
+          <h2>Баг, эрсдэлийн товч тайлан</h2>
+        </div>
+        <div id="bagSummary" class="summary-grid"></div>
+      </section>
 
       <section class="card report-card">
         <div class="section-title">
@@ -70,6 +80,6 @@
   </main>
 
   <footer><div class="wrap footer-grid"><div><p>© <span id="year"></span> Зүүнбүрэн сумын Эрүүл мэндийн төв</p><small class="credits">Зохиогч, хөгжүүлэгч: L.BATTSOG.</small></div></div></footer>
-  <script type="module" src="admin.js?v=bg1"></script>
+  <script type="module" src="admin.js?v=pro2"></script>
 </body>
 </html>

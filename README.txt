@@ -21,3 +21,25 @@ BG-SMALLFONT хувилбар:
 Шалгах:
 Нүүр: https://.../Being-jin/?v=bg1
 Админ: https://.../Being-jin/admin.html?v=bg1
+
+
+PRO1 нэмэлт:
+- Иргэнд “Эрүүл мэндийн дүгнэлт” гарна.
+- “Дараагийн алхам” хэсэг нэмэгдсэн.
+- Зөвлөмж хэвлэхэд албан тайлан шиг харагдана.
+- Админ дээр өндөр эрсдэлтэй, таргалалт II/III, даралт, сахар, халдварт шинжийн тусгай шүүлтүүр нэмсэн.
+- Баг тус бүрийн нэгтгэл тайлан нэмсэн.
+- Админ дээр “Нэгтгэл хэвлэх” товч нэмсэн.
+- CSV-д гол хүчин зүйл, дараагийн алхам нэмэгдсэн.
+
+Шалгах:
+Нүүр: https://.../Being-jin/?v=pro1
+Админ: https://.../Being-jin/admin.html?v=pro1
+
+PRO2 READFIX:
+- Admin 0 харагдах асуудалд зориулж Firestore read rule нэмсэн.
+- Admin.js orderBy ашиглахгүй, бүх бичлэгийг уншаад дотроо эрэмбэлнэ.
+- Заавал Firebase Console → Firestore Database → Rules дээр firebase-rules.txt доторх rule-ийг хуулж Publish дарна.
+Шалгах:
+Нүүр: https://.../Being-jin/?v=pro2
+Админ: https://.../Being-jin/admin.html?v=pro2
